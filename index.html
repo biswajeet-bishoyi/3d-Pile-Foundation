@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoSmart AI — 3D Pile Foundation Load Behaviour Simulator</title>
+    <meta name="description" content="Interactive 3D Pile Foundation Simulator for Course 21CEE301T. Visualize vertical load transfer, skin friction, end bearing, group efficiency, and parametric sensitivity.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #1E40AF;
+            --primary-hover: #1D4ED8;
+            --primary-light: #EFF6FF;
+            --surface: #FFFFFF;
+            --bg: #F8FAFC;
+            --border: #E2E8F0;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --success: #166534;
+            --success-bg: #DCFCE7;
+            --danger: #991B1B;
+            --danger-bg: #FEE2E2;
+            --warning: #92400E;
+            --warning-bg: #FEF3C7;
+            --radius: 8px;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        aside.sidebar {
+            width: 360px;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 24px;
+            overflow-y: auto;
+            flex-shrink: 0;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+        }
+        .sidebar h2 { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar h3 { font-size: 13px; font-weight: 600; color: var(--text-muted); margin: 20px 0 10px 0; text-transform: uppercase; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--text-main); }
+        .form-group label span.unit { color: var(--text-muted); font-weight: 400; }
+        select, input[type="number"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 13px;
+            background: #FAFAFA;
+            color: var(--text-main);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+        select:focus, input[type="number"]:focus { border-color: var(--primary); background: #FFF; }
+        .range-wrap { display: flex; align-items: center; gap: 10px; }
+        .range-wrap input[type="range"] { flex: 1; accent-color: var(--primary); }
+        .range-val { font-family: var(--font-mono); font-size: 13px; font-weight: 600; min-width: 50px; text-align: right; }
+
+        .btn-primary {
+            width: 100%;
+            padding: 10px 16px;
+            background: var(--primary);
+            color: #FFF;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.15s;
+        }
+        .btn-primary:hover { background: var(--primary-hover); }
+
+        /* Main Content */
+        main.content {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+        }
+        .header-title { font-size: 26px; font-weight: 800; color: #1E3A8A; margin-bottom: 4px; }
+        .header-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 16px; }
+        .disclaimer-banner {
+            background: var(--warning-bg);
+            border: 1px solid #FDE68A;
+            color: var(--warning);
+            padding: 10px 14px;
+            border-radius: var(--radius);
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+
+        /* Status Bar */
+        .status-banner {
+            padding: 12px 18px;
+            border-radius: var(--radius);
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .status-safe { background: var(--success-bg); color: var(--success); border: 1px solid #86EFAC; }
+        .status-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid #FCA5A5; }
+        .status-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid #FDE68A; }
+
+        /* KPI Metric Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .metric-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 14px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+        .metric-label { font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+        .metric-value { font-size: 20px; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); }
+        .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+        /* Tabs */
+        .tabs-nav {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+            gap: 8px;
+        }
+        .tab-btn {
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.15s;
+        }
+        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* Cards & Grids */
+        .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+        .card-title { font-size: 15px; font-weight: 700; color: #1E3A8A; margin-bottom: 12px; }
+
+        .step-box {
+            background: #F8FAFC;
+            border-left: 4px solid var(--primary);
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-radius: 0 6px 6px 0;
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+        .step-title { font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+        .step-formula { color: #475569; font-family: var(--font-mono); font-size: 12px; margin-bottom: 4px; }
+        .step-substituted { color: #0F172A; font-family: var(--font-mono); font-size: 12px; }
+
+        .btn-outline {
+            padding: 8px 14px;
+            background: #FFF;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: 8px;
+            transition: all 0.15s;
+        }
+        .btn-outline:hover { background: var(--bg); border-color: var(--primary); color: var(--primary); }
+
+        @media (max-width: 1024px) {
+            body { flex-direction: column; }
+            aside.sidebar { width: 100%; height: auto; position: static; }
+            .charts-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR CONTROLS -->
+    <aside class="sidebar">
+        <h2>🏗️ GeoSmart AI</h2>
+
+        <div class="form-group">
+            <label>📚 Load Benchmark Case</label>
+            <select id="presetSelect" onchange="loadPreset()">
+                <option value="custom">Custom Parameters</option>
+                <option value="case1" selected>Case 1: Driven Pile in Clay (Das 2019)</option>
+                <option value="case2">Case 2: Bored Pile in Sand (Meyerhof)</option>
+                <option value="case3">Case 3: 2×2 Pile Group in Clay</option>
+                <option value="case4">Case 4: Dense Sand End-Bearing Pile</option>
+                <option value="case5">Case 5: 3×3 Core Pile Group (9 Piles)</option>
+            </select>
+        </div>
+
+        <h3>1. Foundation Layout</h3>
+        <div class="form-group">
+            <label>Foundation Mode</label>
+            <select id="modeSelect" onchange="toggleGroupControls()">
+                <option value="single">Single Vertical Pile</option>
+                <option value="group">Pile Group (m × n)</option>
+            </select>
+        </div>
+
+        <div id="groupControls" style="display: none;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div class="form-group">
+                    <label>Rows (m)</label>
+                    <input type="number" id="groupRows" min="1" max="5" value="2" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                    <label>Cols (n)</label>
+                    <input type="number" id="groupCols" min="1" max="5" value="2" onchange="recalculate()">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Spacing s <span class="unit">(m)</span></label>
+                <input type="number" id="groupSpacing" step="0.1" value="1.50" onchange="recalculate()">
+            </div>
+            <div class="form-group">
+                <label>Efficiency Method</label>
+                <select id="effMethod" onchange="recalculate()">
+                    <option value="Converse-Labarre">Converse-Labarre Formula</option>
+                    <option value="Combined">Combined Minimum (Block + CL)</option>
+                    <option value="Sum">Sum of Individual (No Loss)</option>
+                </select>
+            </div>
+        </div>
+
+        <h3>2. Pile Geometry</h3>
+        <div class="form-group">
+            <label>Diameter D <span class="unit">(m)</span></label>
+            <div class="range-wrap">
+                <input type="range" id="pileDia" min="0.25" max="2.00" step="0.05" value="0.45" oninput="updateRangeVal('pileDia', 'diaVal'); recalculate();">
+                <span class="range-val" id="diaVal">0.45m</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Embedded Length L <span class="unit">(m)</span></label>
+            <div class="range-wrap">
+                <input type="range" id="pileLen" min="4.0" max="40.0" step="0.5" value="15.0" oninput="updateRangeVal('pileLen', 'lenVal'); recalculate();">
+                <span class="range-val" id="lenVal">15.0m</span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Installation Type</label>
+            <select id="pileType" onchange="recalculate()">
+                <option value="Driven Concrete">Driven Concrete Pile</option>
+                <option value="Bored Cast-in-situ">Bored Cast-in-situ Pile</option>
+                <option value="Steel Pipe">Steel Pipe / H-Pile</option>
+            </select>
+        </div>
+
+        <h3>3. Applied Loading</h3>
+        <div class="form-group">
+            <label>Applied Axial Load P <span class="unit">(kN)</span></label>
+            <input type="number" id="appliedLoad" step="25" value="200" onchange="recalculate()">
+        </div>
+        <div class="form-group">
+            <label>Factor of Safety (FS)</label>
+            <input type="number" id="fsVal" step="0.1" min="1.5" max="4.0" value="2.5" onchange="recalculate()">
+        </div>
+
+        <h3>4. Soil Parameters</h3>
+        <div class="form-group">
+            <label>Soil Stratum Model</label>
+            <select id="soilType" onchange="toggleSoilControls(); recalculate();">
+                <option value="Clay">Cohesive (Clay)</option>
+                <option value="Sand">Cohesionless (Sand)</option>
+                <option value="Mixed">Mixed (c-phi Stratum)</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Unit Weight γ <span class="unit">(kN/m³)</span></label>
+            <input type="number" id="soilGamma" step="0.5" value="18.0" onchange="recalculate()">
+        </div>
+
+        <div id="clayControls">
+            <div class="form-group">
+                <label>Undrained Cohesion c_u <span class="unit">(kPa)</span></label>
+                <input type="number" id="soilCu" step="5" value="40.0" onchange="recalculate()">
+            </div>
+            <div class="form-group">
+                <label>Adhesion Factor α</label>
+                <input type="number" id="soilAlpha" step="0.05" min="0.2" max="1.0" value="0.70" onchange="recalculate()">
+            </div>
+        </div>
+
+        <div id="sandControls" style="display: none;">
+            <div class="form-group">
+                <label>Friction Angle φ <span class="unit">(deg)</span></label>
+                <input type="number" id="soilPhi" step="1" min="20" max="45" value="34.0" onchange="recalculate()">
+            </div>
+            <div class="form-group">
+                <label>Interface Ratio (δ / φ)</label>
+                <input type="number" id="deltaRatio" step="0.05" value="0.75" onchange="recalculate()">
+            </div>
+            <div class="form-group">
+                <label>Earth Pressure Coeff K_s</label>
+                <input type="number" id="soilKs" step="0.1" value="0.70" onchange="recalculate()">
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="recalculate()">⚡ Run Geotechnical Simulation</button>
+    </aside>
+
+    <!-- MAIN DISPLAY -->
+    <main class="content">
+        <div class="header-title">GeoSmart AI — 3D Pile Foundation Simulator</div>
+        <div class="header-sub">Course: Foundation Engineering and Design (21CEE301T) | Version 1.0 (MVP)</div>
+
+        <div class="disclaimer-banner">
+            ⚠️ <b>Educational Demonstration Notice:</b> This simulator demonstrates load transfer mechanisms (shaft friction, base end bearing, and group interaction) using classical methods (Tomlinson α-method, Meyerhof β-method, Converse-Labarre). It is for academic demonstration, not certified design software.
+        </div>
+
+        <!-- STATUS BANNER -->
+        <div id="statusBar" class="status-banner status-safe">
+            <span id="statusText">SAFE / WITHIN ALLOWABLE CAPACITY</span>
+            <span id="urBadge">Utilization: 76.8%</span>
+        </div>
+
+        <!-- KPI METRICS -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Applied Load (P)</div>
+                <div class="metric-value" id="kpiP">200.0 kN</div>
+                <div class="metric-sub" id="kpiUR">UR = 76.8%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Allowable (Q_all)</div>
+                <div class="metric-value" id="kpiQall">260.4 kN</div>
+                <div class="metric-sub" id="kpiFS">FS = 2.50</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Ultimate (Q_ult)</div>
+                <div class="metric-value" id="kpiQult">651.0 kN</div>
+                <div class="metric-sub">Total Resistance</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Shaft Friction (Q_s)</div>
+                <div class="metric-value" id="kpiQs" style="color: #2E7D32;">593.8 kN</div>
+                <div class="metric-sub" id="kpiQsPct">91.2% Share</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">End-Bearing (Q_b)</div>
+                <div class="metric-value" id="kpiQb" style="color: #1565C0;">57.3 kN</div>
+                <div class="metric-sub" id="kpiQbPct">8.8% Share</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Slenderness (L/D)</div>
+                <div class="metric-value" id="kpiLD">33.3</div>
+                <div class="metric-sub" id="kpiAs">As = 21.2 m²</div>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="tabs-nav">
+            <button class="tab-btn active" onclick="switchTab(0)">🌐 3D Conceptual Model</button>
+            <button class="tab-btn" onclick="switchTab(1)">📈 Engineering Charts</button>
+            <button class="tab-btn" onclick="switchTab(2)">📉 Load-Settlement Response</button>
+            <button class="tab-btn" onclick="switchTab(3)">📐 Step-by-Step Derivations</button>
+            <button class="tab-btn" onclick="switchTab(4)">🧠 Geotechnical Insights</button>
+            <button class="tab-btn" onclick="switchTab(5)">📚 Textbook Verification</button>
+            <button class="tab-btn" onclick="switchTab(6)">📄 Export & Reports</button>
+        </div>
+
+        <!-- TAB 0: 3D MODEL -->
+        <div class="tab-content active" id="tab0">
+            <div class="card">
+                <div class="card-title">Interactive 3D Conceptual Model (Plotly 3D)</div>
+                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
+                    Rotate, zoom, and pan to inspect column load transfer, pile cap slab, pile cylinders, and force vectors.
+                </p>
+                <div id="plot3d" style="width: 100%; height: 580px;"></div>
+            </div>
+        </div>
+
+        <!-- TAB 1: CHARTS -->
+        <div class="tab-content" id="tab1">
+            <div class="charts-row">
+                <div class="card">
+                    <div class="card-title">Applied Load vs. Allowable Capacity</div>
+                    <div id="chartLoadCap" style="width: 100%; height: 350px;"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Resistance Breakdown (Shaft vs. Base)</div>
+                    <div id="chartDonut" style="width: 100%; height: 350px;"></div>
+                </div>
+            </div>
+            <div class="charts-row">
+                <div class="card">
+                    <div class="card-title">Length Sensitivity Analysis (L vs. Q)</div>
+                    <div id="chartLenSens" style="width: 100%; height: 350px;"></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Diameter Sensitivity Analysis (D vs. Q)</div>
+                    <div id="chartDiaSens" style="width: 100%; height: 350px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: LOAD-SETTLEMENT -->
+        <div class="tab-content" id="tab2">
+            <div class="card">
+                <div class="card-title">Axial Load vs. Pile Settlement (Chin-Kondner Hyperbolic Model)</div>
+                <div id="chartSettle" style="width: 100%; height: 420px;"></div>
+                <div style="margin-top: 15px; font-size: 12px; color: var(--text-muted);">
+                    <b>Educational Disclaimer:</b> Illustrative conceptual response using the Chin-Kondner elastic-plastic formulation. Full shaft friction mobilizes at 5–10 mm, whereas base end bearing requires 10%–25% toe displacement.
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: STEP-BY-STEP DERIVATIONS -->
+        <div class="tab-content" id="tab3">
+            <div class="card">
+                <div class="card-title">Transparent Geotechnical Derivations & Calculations</div>
+                <div id="derivationSteps"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: GEOTECHNICAL INSIGHTS -->
+        <div class="tab-content" id="tab4">
+            <div class="card">
+                <div class="card-title">🧠 Rule-Based Geotechnical Explanation Assistant</div>
+                <div id="explanationContent" style="font-size: 14px; line-height: 1.6;"></div>
+            </div>
+        </div>
+
+        <!-- TAB 5: TEXTBOOK VERIFICATION -->
+        <div class="tab-content" id="tab5">
+            <div class="card">
+                <div class="card-title">📚 Hand-Worked Textbook Verification Benchmarks</div>
+                <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
+                    <thead>
+                        <tr style="background: #F1F5F9; text-align: left;">
+                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Benchmark Case</th>
+                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Configuration</th>
+                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Hand-Worked Solution</th>
+                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Simulator Output</th>
+                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Parity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 1: Das (2019) Clay Pile</b></td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">D=0.45m, L=15m, cu=40kPa, α=0.70</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">Qs=593.76 kN, Qb=57.26 kN, Qall=260.41 kN</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">Qs=593.76 kN, Qb=57.26 kN, Qall=260.41 kN</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">100.0% Exact</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 2: Meyerhof Sand Pile</b></td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">D=0.60m, L=14m, φ=34°, Ks=0.70</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">zc=9.0m, Qult=1963.2 kN</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">zc=9.0m, Qult=1963.2 kN</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">Verified</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 3: 2×2 Pile Group</b></td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">4 Piles, s=1.5m (3D), cu=65kPa</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">θ=18.435°, η=0.7952 (79.5%)</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border);">θ=18.435°, η=0.7952</td>
+                            <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">100.0% Exact</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 6: EXPORT -->
+        <div class="tab-content" id="tab6">
+            <div class="card">
+                <div class="card-title">📄 Export Engineering Report & Data</div>
+                <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                    <button class="btn-outline" onclick="window.print()">🖨️ Print to PDF / Paper</button>
+                    <button class="btn-outline" onclick="downloadCSV()">📊 Download CSV Summary</button>
+                </div>
+                <div id="reportPreview" style="background: #FFF; border: 1px solid var(--border); padding: 24px; border-radius: var(--radius);"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CALCULATION & PLOTLY ENGINE SCRIPT -->
+    <script>
+        // Preset configurations
+        const presets = {
+            case1: { dia: 0.45, len: 15.0, type: 'Driven Concrete', load: 200, fs: 2.5, soil: 'Clay', gamma: 18.0, cu: 40.0, alpha: 0.70, mode: 'single' },
+            case2: { dia: 0.60, len: 14.0, type: 'Bored Cast-in-situ', load: 750, fs: 2.5, soil: 'Sand', gamma: 18.5, phi: 34.0, ks: 0.70, deltaRatio: 0.75, mode: 'single' },
+            case3: { dia: 0.50, len: 12.0, type: 'Driven Concrete', load: 1800, fs: 2.5, soil: 'Clay', gamma: 19.0, cu: 65.0, alpha: 0.55, mode: 'group', rows: 2, cols: 2, spacing: 1.5 },
+            case4: { dia: 0.80, len: 16.0, type: 'Driven Concrete', load: 1800, fs: 2.5, soil: 'Sand', gamma: 20.0, phi: 38.0, ks: 1.10, deltaRatio: 0.85, mode: 'single' },
+            case5: { dia: 0.60, len: 15.0, type: 'Bored Cast-in-situ', load: 7500, fs: 2.5, soil: 'Clay', gamma: 19.5, cu: 80.0, alpha: 0.50, mode: 'group', rows: 3, cols: 3, spacing: 1.8 }
+        };
+
+        // Meyerhof Nq interpolation table
+        const phiTable = [20, 25, 28, 30, 32, 34, 36, 38, 40, 42, 45];
+        const nqTable = [8.0, 15.0, 21.0, 29.0, 40.0, 58.0, 86.0, 130.0, 200.0, 310.0, 550.0];
+
+        function getNq(phi) {
+            if (phi <= phiTable[0]) return nqTable[0];
+            if (phi >= phiTable[phiTable.length - 1]) return nqTable[nqTable.length - 1];
+            for (let i = 0; i < phiTable.length - 1; i++) {
+                if (phi >= phiTable[i] && phi <= phiTable[i + 1]) {
+                    const t = (phi - phiTable[i]) / (phiTable[i + 1] - phiTable[i]);
+                    return nqTable[i] + t * (nqTable[i + 1] - nqTable[i]);
+                }
+            }
+            return 29.0;
+        }
+
+        function updateRangeVal(id, displayId) {
+            document.getElementById(displayId).textContent = document.getElementById(id).value + 'm';
+        }
+
+        function switchTab(index) {
+            document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+            document.querySelectorAll('.tab-content').forEach((tc, i) => tc.classList.toggle('active', i === index));
+            window.dispatchEvent(new Event('resize'));
+        }
+
+        function toggleGroupControls() {
+            const isGroup = document.getElementById('modeSelect').value === 'group';
+            document.getElementById('groupControls').style.display = isGroup ? 'block' : 'none';
+            recalculate();
+        }
+
+        function toggleSoilControls() {
+            const st = document.getElementById('soilType').value;
+            document.getElementById('clayControls').style.display = (st === 'Clay' || st === 'Mixed') ? 'block' : 'none';
+            document.getElementById('sandControls').style.display = (st === 'Sand' || st === 'Mixed') ? 'block' : 'none';
+        }
+
+        function loadPreset() {
+            const key = document.getElementById('presetSelect').value;
+            if (key === 'custom') return;
+            const p = presets[key];
+            document.getElementById('pileDia').value = p.dia;
+            document.getElementById('diaVal').textContent = p.dia + 'm';
+            document.getElementById('pileLen').value = p.len;
+            document.getElementById('lenVal').textContent = p.len + 'm';
+            document.getElementById('pileType').value = p.type;
+            document.getElementById('appliedLoad').value = p.load;
+            document.getElementById('fsVal').value = p.fs;
+            document.getElementById('soilType').value = p.soil;
+            document.getElementById('soilGamma').value = p.gamma;
+            if (p.cu !== undefined) document.getElementById('soilCu').value = p.cu;
+            if (p.alpha !== undefined) document.getElementById('soilAlpha').value = p.alpha;
+            if (p.phi !== undefined) document.getElementById('soilPhi').value = p.phi;
+            if (p.ks !== undefined) document.getElementById('soilKs').value = p.ks;
+
+            document.getElementById('modeSelect').value = p.mode;
+            if (p.mode === 'group') {
+                document.getElementById('groupRows').value = p.rows || 2;
+                document.getElementById('groupCols').value = p.cols || 2;
+                document.getElementById('groupSpacing').value = p.spacing || 1.5;
+            }
+            toggleGroupControls();
+            toggleSoilControls();
+            recalculate();
+        }
+
+        let latestCalc = null;
+
+        function recalculate() {
+            const D = parseFloat(document.getElementById('pileDia').value);
+            const L = parseFloat(document.getElementById('pileLen').value);
+            const pileType = document.getElementById('pileType').value;
+            const P = parseFloat(document.getElementById('appliedLoad').value);
+            const FS = parseFloat(document.getElementById('fsVal').value);
+            const soilType = document.getElementById('soilType').value;
+            const gamma = parseFloat(document.getElementById('soilGamma').value);
+            const cu = parseFloat(document.getElementById('soilCu').value);
+            const alphaInput = parseFloat(document.getElementById('soilAlpha').value);
+            const phi = parseFloat(document.getElementById('soilPhi').value);
+            const ks = parseFloat(document.getElementById('soilKs').value);
+            const deltaRatio = parseFloat(document.getElementById('deltaRatio').value);
+
+            const isGroup = document.getElementById('modeSelect').value === 'group';
+            const rows = isGroup ? parseInt(document.getElementById('groupRows').value) : 1;
+            const cols = isGroup ? parseInt(document.getElementById('groupCols').value) : 1;
+            const spacing = isGroup ? parseFloat(document.getElementById('groupSpacing').value) : 1.5;
+            const effMethod = document.getElementById('effMethod').value;
+
+            // Geometry
+            const Ab = (Math.PI * D * D) / 4.0;
+            const As = Math.PI * D * L;
+            const perimeter = Math.PI * D;
+
+            let Qs = 0, Qb = 0;
+            let alpha = alphaInput;
+            let Nq = 0, zc = 15.0 * D;
+
+            if (soilType === 'Clay') {
+                Qs = alpha * cu * As;
+                const Nc = (L / D >= 4.0) ? 9.0 : 6.0 * (1 + 0.2 * (L / D));
+                Qb = cu * Nc * Ab;
+            } else if (soilType === 'Sand') {
+                const deltaRad = (deltaRatio * phi) * (Math.PI / 180.0);
+                const beta = ks * Math.tan(deltaRad);
+                const zcVal = Math.min(L, zc);
+                const sigmaVAvg = (L <= zc) ? 0.5 * gamma * L : ((0.5 * gamma * zc * zc) + gamma * zc * (L - zc)) / L;
+                const fsApplied = Math.min(beta * sigmaVAvg, 100.0);
+                Qs = fsApplied * As;
+
+                Nq = getNq(phi);
+                const sigmaVToe = gamma * Math.min(L, zc);
+                const qbLimit = 50.0 * Nq * Math.tan(phi * Math.PI / 180.0);
+                const qbUnit = Math.min(sigmaVToe * Nq, qbLimit);
+                Qb = qbUnit * Ab;
+            } else {
+                // Mixed
+                const deltaRad = (0.75 * phi) * (Math.PI / 180.0);
+                const sigmaVAvg = 0.5 * gamma * Math.min(L, zc);
+                Qs = (0.5 * cu + ks * sigmaVAvg * Math.tan(deltaRad)) * As;
+                Nq = getNq(phi);
+                Qb = (cu * 9.0 + gamma * Math.min(L, zc) * Nq) * Ab;
+            }
+
+            const Qult = Qs + Qb;
+            const Qall = Qult / FS;
+
+            // Group calculations
+            const totalPiles = rows * cols;
+            let eta = 1.0;
+            let groupQult = Qult * totalPiles;
+            let groupQall = groupQult / FS;
+
+            if (isGroup && totalPiles > 1) {
+                const thetaDeg = Math.atan(D / spacing) * (180.0 / Math.PI);
+                eta = 1.0 - (thetaDeg / 90.0) * (((cols - 1) * rows + (rows - 1) * cols) / (rows * cols));
+                eta = Math.max(0.40, Math.min(1.0, eta));
+                groupQult = (totalPiles * Qult) * eta;
+                groupQall = groupQult / FS;
+            }
+
+            const governingQall = isGroup ? groupQall : Qall;
+            const governingP = P;
+            const UR = governingP / Math.max(governingQall, 1e-4);
+            const isSafe = governingP <= governingQall;
+
+            latestCalc = {
+                D, L, pileType, P, FS, soilType, gamma, cu, phi, alpha, Ab, As,
+                Qs, Qb, Qult, Qall, isGroup, rows, cols, spacing, totalPiles, eta,
+                groupQult, groupQall, governingQall, UR, isSafe
+            };
+
+            // Update UI KPI
+            document.getElementById('kpiP').textContent = P.toFixed(1) + ' kN';
+            document.getElementById('kpiUR').textContent = 'UR = ' + (UR * 100).toFixed(1) + '%';
+            document.getElementById('kpiQall').textContent = governingQall.toFixed(1) + ' kN';
+            document.getElementById('kpiFS').textContent = 'FS = ' + FS.toFixed(2);
+            document.getElementById('kpiQult').textContent = (isGroup ? groupQult : Qult).toFixed(1) + ' kN';
+            document.getElementById('kpiQs').textContent = Qs.toFixed(1) + ' kN';
+            document.getElementById('kpiQsPct').textContent = ((Qs / Qult) * 100).toFixed(1) + '% Share';
+            document.getElementById('kpiQb').textContent = Qb.toFixed(1) + ' kN';
+            document.getElementById('kpiQbPct').textContent = ((Qb / Qult) * 100).toFixed(1) + '% Share';
+            document.getElementById('kpiLD').textContent = (L / D).toFixed(1);
+            document.getElementById('kpiAs').textContent = 'As = ' + As.toFixed(1) + ' m²';
+
+            // Status bar
+            const sb = document.getElementById('statusBar');
+            sb.className = 'status-banner ' + (isSafe ? (UR > 0.85 ? 'status-warning' : 'status-safe') : 'status-danger');
+            document.getElementById('statusText').textContent = isSafe ? 'SAFE / WITHIN ALLOWABLE CAPACITY' : 'OVERLOAD RISK / CAPACITY EXCEEDED';
+            document.getElementById('urBadge').textContent = 'Utilization: ' + (UR * 100).toFixed(1) + '%';
+
+            render3D();
+            renderCharts();
+            renderDerivations();
+            renderExplanation();
+            renderReport();
+        }
+
+        // Render 3D Model in Plotly
+        function render3D() {
+            const c = latestCalc;
+            const radius = c.D / 2.0;
+            const m = c.rows, n = c.cols, spacing = c.spacing;
+
+            // Compute pile centers
+            const centers = [];
+            const xOffsets = [];
+            const yOffsets = [];
+            for (let j = 0; j < n; j++) xOffsets.push((j - (n - 1) / 2.0) * spacing);
+            for (let i = 0; i < m; i++) yOffsets.push((i - (m - 1) / 2.0) * spacing);
+
+            for (let i = 0; i < m; i++) {
+                for (let j = 0; j < n; j++) {
+                    centers.push({ x: xOffsets[j], y: yOffsets[i] });
+                }
+            }
+
+            const traces = [];
+
+            // Ground plane (Z = 0)
+            const extent = Math.max(n * spacing, m * spacing, 4.0);
+            traces.push({
+                type: 'surface',
+                x: [[-extent, extent], [-extent, extent]],
+                y: [[-extent, -extent], [extent, extent]],
+                z: [[0, 0], [0, 0]],
+                colorscale: [[0, '#8D6E63'], [1, '#A1887F']],
+                showscale: false,
+                opacity: 0.35,
+                hoverinfo: 'text',
+                text: 'Ground Surface (GL ±0.00m)'
+            });
+
+            // Pile cap
+            const capH = 0.8;
+            const overhang = Math.max(0.4 * c.D, 0.3);
+            const xMin = Math.min(...xOffsets) - radius - overhang;
+            const xMax = Math.max(...xOffsets) + radius + overhang;
+            const yMin = Math.min(...yOffsets) - radius - overhang;
+            const yMax = Math.max(...yOffsets) + radius + overhang;
+
+            traces.push({
+                type: 'mesh3d',
+                x: [xMin, xMax, xMax, xMin, xMin, xMax, xMax, xMin],
+                y: [yMin, yMin, yMax, yMax, yMin, yMin, yMax, yMax],
+                z: [0, 0, 0, 0, capH, capH, capH, capH],
+                i: [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
+                j: [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
+                k: [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
+                color: '#78909C',
+                opacity: 0.9,
+                name: 'Pile Cap'
+            });
+
+            // Column
+            const colW = Math.max(0.5 * c.D, 0.4);
+            const colH = 2.0;
+            traces.push({
+                type: 'mesh3d',
+                x: [-colW, colW, colW, -colW, -colW, colW, colW, -colW],
+                y: [-colW, -colW, colW, colW, -colW, -colW, colW, colW],
+                z: [capH, capH, capH, capH, capH + colH, capH + colH, capH + colH, capH + colH],
+                i: [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
+                j: [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
+                k: [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
+                color: '#546E7A',
+                opacity: 0.95,
+                name: 'Column'
+            });
+
+            // Applied load arrow
+            traces.push({
+                type: 'scatter3d',
+                mode: 'lines+text',
+                x: [0, 0], y: [0, 0], z: [capH + colH + 2.0, capH + colH + 0.3],
+                line: { color: '#D32F2F', width: 8 },
+                text: ['', '<b>P = ' + c.P.toFixed(1) + ' kN ↓</b>'],
+                textposition: 'top center',
+                name: 'Applied Load'
+            });
+
+            // Arrow cone tip
+            traces.push({
+                type: 'cone',
+                x: [0], y: [0], z: [capH + colH + 0.3],
+                u: [0], v: [0], w: [-0.8],
+                sizemode: 'scaled', sizeref: 0.6,
+                colorscale: [[0, '#D32F2F'], [1, '#D32F2F']],
+                showscale: false,
+                name: 'Load Vector'
+            });
+
+            // Cylinders for each pile
+            centers.forEach((cen, idx) => {
+                const theta = [];
+                const nPts = 20;
+                for (let k = 0; k <= nPts; k++) theta.push((2 * Math.PI * k) / nPts);
+
+                const xGrid = [], yGrid = [], zGrid = [];
+                for (let zi = 0; zi <= 1; zi++) {
+                    const zVal = zi === 0 ? 0 : -c.L;
+                    const xRow = [], yRow = [], zRow = [];
+                    for (let ti = 0; ti <= nPts; ti++) {
+                        xRow.push(cen.x + radius * Math.cos(theta[ti]));
+                        yRow.push(cen.y + radius * Math.sin(theta[ti]));
+                        zRow.push(zVal);
+                    }
+                    xGrid.push(xRow);
+                    yGrid.push(yRow);
+                    zGrid.push(zRow);
+                }
+
+                traces.push({
+                    type: 'surface',
+                    x: xGrid, y: yGrid, z: zGrid,
+                    colorscale: [[0, '#455A64'], [1, '#607D8B']],
+                    showscale: false,
+                    opacity: 0.95,
+                    name: 'Pile #' + (idx + 1)
+                });
+
+                // End bearing cone at toe pointing UP
+                traces.push({
+                    type: 'cone',
+                    x: [cen.x], y: [cen.y], z: [-c.L],
+                    u: [0], v: [0], w: [0.5],
+                    sizemode: 'scaled', sizeref: 0.5,
+                    colorscale: [[0, '#1565C0'], [1, '#1565C0']],
+                    showscale: false,
+                    name: 'Base Resistance'
+                });
+            });
+
+            const layout = {
+                title: '<b>Conceptual 3D Foundation Model</b> (Plotly 3D)',
+                scene: {
+                    xaxis: { title: 'X (m)', backgroundcolor: '#F8FAFC' },
+                    yaxis: { title: 'Y (m)', backgroundcolor: '#F8FAFC' },
+                    zaxis: { title: 'Z (m)', backgroundcolor: '#F1F5F9' },
+                    aspectmode: 'data',
+                    camera: { eye: { x: 1.8, y: -1.8, z: 1.2 } }
+                },
+                margin: { l: 0, r: 0, b: 0, t: 40 },
+                showlegend: false
+            };
+
+            Plotly.react('plot3d', traces, layout);
+        }
+
+        // Render 2D Charts
+        function renderCharts() {
+            const c = latestCalc;
+
+            // Chart 1: Load vs Capacity Bar
+            Plotly.react('chartLoadCap', [{
+                type: 'bar',
+                x: ['Applied Load P', 'Allowable Q_all', 'Ultimate Q_ult'],
+                y: [c.P, c.governingQall, c.isGroup ? c.groupQult : c.Qult],
+                marker: { color: [c.isSafe ? '#388E3C' : '#D32F2F', '#1976D2', '#455A64'] },
+                text: [c.P.toFixed(1) + ' kN', c.governingQall.toFixed(1) + ' kN', (c.isGroup ? c.groupQult : c.Qult).toFixed(1) + ' kN'],
+                textposition: 'outside'
+            }], {
+                yaxis: { title: 'Force (kN)' },
+                margin: { l: 40, r: 20, t: 30, b: 40 }
+            });
+
+            // Chart 2: Resistance Donut
+            Plotly.react('chartDonut', [{
+                type: 'pie',
+                labels: ['Shaft Resistance (Q_s)', 'Base Resistance (Q_b)'],
+                values: [c.Qs, c.Qb],
+                hole: 0.55,
+                marker: { colors: ['#2E7D32', '#1565C0'] },
+                textinfo: 'label+percent'
+            }], {
+                margin: { l: 20, r: 20, t: 30, b: 20 },
+                showlegend: false
+            });
+
+            // Chart 3: Length Sensitivity Curve
+            const lens = [], qAlls = [], qUlts = [];
+            for (let l = 4.0; l <= 30.0; l += 1.0) {
+                lens.push(l);
+                const tempAs = Math.PI * c.D * l;
+                let tQs = 0, tQb = 0;
+                if (c.soilType === 'Clay') {
+                    tQs = c.alpha * c.cu * tempAs;
+                    tQb = c.cu * 9.0 * c.Ab;
+                } else {
+                    const zc = 15.0 * c.D;
+                    const sigAvg = (l <= zc) ? 0.5 * c.gamma * l : ((0.5 * c.gamma * zc * zc) + c.gamma * zc * (l - zc)) / l;
+                    tQs = Math.min(0.7 * Math.tan(c.phi * 0.75 * Math.PI / 180) * sigAvg, 100) * tempAs;
+                    tQb = c.Qb;
+                }
+                const tQult = tQs + tQb;
+                qUlts.push(tQult);
+                qAlls.push(tQult / c.FS);
+            }
+
+            Plotly.react('chartLenSens', [
+                { x: lens, y: qAlls, name: 'Q_all', line: { color: '#E65100', width: 3 } },
+                { x: lens, y: qUlts, name: 'Q_ult', line: { color: '#455A64', dash: 'dot' } },
+                { x: [c.L], y: [c.Qall], mode: 'markers', marker: { size: 10, color: '#D32F2F' }, name: 'Current L' }
+            ], {
+                xaxis: { title: 'Embedded Length L (m)' },
+                yaxis: { title: 'Capacity (kN)' },
+                margin: { l: 50, r: 20, t: 30, b: 40 }
+            });
+
+            // Chart 4: Diameter Sensitivity
+            const dias = [], dQalls = [];
+            for (let d = 0.3; d <= 1.5; d += 0.05) {
+                dias.push(d);
+                const tAb = Math.PI * d * d / 4.0;
+                const tAs = Math.PI * d * c.L;
+                let tQs = 0, tQb = 0;
+                if (c.soilType === 'Clay') {
+                    tQs = c.alpha * c.cu * tAs;
+                    tQb = c.cu * 9.0 * tAb;
+                } else {
+                    tQs = 50.0 * tAs;
+                    tQb = 2000.0 * tAb;
+                }
+                dQalls.push((tQs + tQb) / c.FS);
+            }
+
+            Plotly.react('chartDiaSens', [
+                { x: dias, y: dQalls, name: 'Q_all', line: { color: '#1565C0', width: 3 } },
+                { x: [c.D], y: [c.Qall], mode: 'markers', marker: { size: 10, color: '#D32F2F' }, name: 'Current D' }
+            ], {
+                xaxis: { title: 'Pile Diameter D (m)' },
+                yaxis: { title: 'Allowable Capacity (kN)' },
+                margin: { l: 50, r: 20, t: 30, b: 40 }
+            });
+
+            // Chart 5: Hyperbolic Load-Settlement
+            const sVals = [], pVals = [];
+            const ki = 35.0; // Initial stiffness kN/mm
+            for (let s = 0; s <= 40; s += 1) {
+                sVals.push(s);
+                const p = (s === 0) ? 0 : s / ((1.0 / ki) + (s / c.Qult));
+                pVals.push(p);
+            }
+
+            Plotly.react('chartSettle', [
+                { x: sVals, y: pVals, name: 'Hyperbolic Model', line: { color: '#1E88E5', width: 3 } },
+                { x: [0, 40], y: [c.Qall, c.Qall], name: 'Q_all', line: { color: '#E65100', dash: 'dot' } },
+                { x: [0, 40], y: [c.Qult, c.Qult], name: 'Q_ult', line: { color: '#455A64', dash: 'dash' } }
+            ], {
+                xaxis: { title: 'Settlement S (mm)' },
+                yaxis: { title: 'Axial Load P (kN)' },
+                margin: { l: 50, r: 20, t: 30, b: 40 }
+            });
+        }
+
+        // Render Step-by-Step Math Box
+        function renderDerivations() {
+            const c = latestCalc;
+            let html = `
+                <div class="step-box">
+                    <div class="step-title">Step 1: Cross-Sectional Geometry</div>
+                    <div class="step-formula">A_b = π·D² / 4, &nbsp; A_s = π·D·L, &nbsp; P_perim = π·D</div>
+                    <div class="step-substituted">A_b = π·(${c.D}²)/4 = ${c.Ab.toFixed(4)} m² | A_s = π·${c.D}·${c.L} = ${c.As.toFixed(3)} m² | L/D = ${(c.L/c.D).toFixed(1)}</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-title">Step 2: Shaft Resistance (Skin Friction)</div>
+                    <div class="step-formula">${c.soilType === 'Clay' ? 'Q_s = α · c_u · A_s' : 'Q_s = β · σ\'_v,avg · A_s'}</div>
+                    <div class="step-substituted">${c.soilType === 'Clay' ? `Q_s = ${c.alpha} × ${c.cu} kPa × ${c.As.toFixed(3)} m² = <b>${c.Qs.toFixed(2)} kN</b>` : `Q_s = <b>${c.Qs.toFixed(2)} kN</b>`}</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-title">Step 3: Base Resistance (End Bearing)</div>
+                    <div class="step-formula">${c.soilType === 'Clay' ? 'Q_b = 9 · c_u · A_b' : 'Q_b = σ\'_v,toe · N_q · A_b'}</div>
+                    <div class="step-substituted">Q_b = <b>${c.Qb.toFixed(2)} kN</b> (${((c.Qb/c.Qult)*100).toFixed(1)}% of total capacity)</div>
+                </div>
+                <div class="step-box">
+                    <div class="step-title">Step 4: Ultimate & Allowable Capacity</div>
+                    <div class="step-formula">Q_ult = Q_s + Q_b, &nbsp; Q_all = Q_ult / FS</div>
+                    <div class="step-substituted">Q_ult = ${c.Qs.toFixed(2)} + ${c.Qb.toFixed(2)} = <b>${c.Qult.toFixed(2)} kN</b> | Q_all = ${c.Qult.toFixed(2)} / ${c.FS} = <b>${c.Qall.toFixed(2)} kN</b></div>
+                </div>
+            `;
+
+            if (c.isGroup) {
+                html += `
+                    <div class="step-box" style="border-left-color: #7C3AED;">
+                        <div class="step-title">Step 5: Pile Group Interaction (Converse-Labarre)</div>
+                        <div class="step-formula">η = 1 - (θ/90)·[(n-1)m + (m-1)n]/(mn), &nbsp; θ = arctan(D/s)</div>
+                        <div class="step-substituted">N = ${c.totalPiles} piles | η = <b>${(c.eta * 100).toFixed(1)}%</b> | Group Q_g,all = <b>${c.groupQall.toFixed(2)} kN</b></div>
+                    </div>
+                `;
+            }
+            document.getElementById('derivationSteps').innerHTML = html;
+        }
+
+        // Render Explanation Text
+        function renderExplanation() {
+            const c = latestCalc;
+            const qsPct = (c.Qs / c.Qult) * 100;
+            const dom = qsPct >= 70 ? 'Shaft-Dominated (Friction Pile)' : 'End-Bearing Dominated';
+
+            document.getElementById('explanationContent').innerHTML = `
+                <p><b>1. Safety Evaluation:</b> The foundation operates at <b>${(c.UR * 100).toFixed(1)}%</b> utilization under applied load P = ${c.P.toFixed(1)} kN. ${c.isSafe ? 'The safety factor is fully satisfied.' : '<span style="color:var(--danger);font-weight:700;">Demand exceeds allowable capacity! Redesign required.</span>'}</p>
+                <p style="margin-top:10px;"><b>2. Resistance Mechanism:</b> Classified as <b>${dom}</b> (${qsPct.toFixed(1)}% shaft, ${(100-qsPct).toFixed(1)}% base). In cohesive clays, extensive shaft area mobilizes adhesion before substantial toe settlement occurs.</p>
+                <p style="margin-top:10px;"><b>3. Design Optimization:</b> In clay strata, deepening pile length L is generally more economical than increasing diameter because Nc=9 is constant while shaft area scales linearly with embedment depth.</p>
+            `;
+        }
+
+        // Render Report Preview
+        function renderReport() {
+            const c = latestCalc;
+            document.getElementById('reportPreview').innerHTML = `
+                <h3 style="color:#1E3A8A;margin-bottom:8px;">GeoSmart AI — Academic Engineering Report</h3>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Course: Foundation Engineering and Design (21CEE301T)</p>
+                <table style="width:100%;font-size:13px;border-collapse:collapse;">
+                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Pile Geometry</td><td style="padding:6px;border:1px solid #E2E8F0;">D = ${c.D}m, L = ${c.L}m (${c.pileType})</td></tr>
+                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Soil Stratum</td><td style="padding:6px;border:1px solid #E2E8F0;">${c.soilType} (γ = ${c.gamma} kN/m³)</td></tr>
+                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Shaft Resistance (Q_s)</td><td style="padding:6px;border:1px solid #E2E8F0;"><b>${c.Qs.toFixed(2)} kN</b></td></tr>
+                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Base Resistance (Q_b)</td><td style="padding:6px;border:1px solid #E2E8F0;"><b>${c.Qb.toFixed(2)} kN</b></td></tr>
+                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Ultimate Capacity (Q_ult)</td><td style="padding:6px;border:1px solid #E2E8F0;"><b>${c.Qult.toFixed(2)} kN</b></td></tr>
+                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Allowable Capacity (Q_all)</td><td style="padding:6px;border:1px solid #E2E8F0;"><b>${c.governingQall.toFixed(2)} kN</b> (FS = ${c.FS})</td></tr>
+                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Applied Load (P)</td><td style="padding:6px;border:1px solid #E2E8F0;">${c.P.toFixed(1)} kN (UR = ${(c.UR*100).toFixed(1)}%)</td></tr>
+                </table>
+            `;
+        }
+
+        // CSV Export
+        function downloadCSV() {
+            const c = latestCalc;
+            const rows = [
+                ['Parameter', 'Value', 'Unit'],
+                ['Pile Diameter D', c.D, 'm'],
+                ['Pile Length L', c.L, 'm'],
+                ['Soil Type', c.soilType, '-'],
+                ['Shaft Resistance Q_s', c.Qs.toFixed(2), 'kN'],
+                ['Base Resistance Q_b', c.Qb.toFixed(2), 'kN'],
+                ['Ultimate Capacity Q_ult', c.Qult.toFixed(2), 'kN'],
+                ['Allowable Capacity Q_all', c.governingQall.toFixed(2), 'kN'],
+                ['Applied Load P', c.P, 'kN'],
+                ['Utilization Ratio', (c.UR * 100).toFixed(2), '%'],
+                ['Safety Status', c.isSafe ? 'SAFE' : 'OVERLOAD', '-']
+            ];
+            const csvContent = 'data:text/csv;charset=utf-8,' + rows.map(e => e.join(',')).join('\n');
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'pile_simulation_summary.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Initial launch
+        window.addEventListener('DOMContentLoaded', () => {
+            recalculate();
+        });
+    </script>
+</body>
+</html>

@@ -632,7 +632,7 @@ with tabs[6]:
 
 
 # ============================================================================
-# FOOTER
+# FOOTER & WSGI SERVERLESS FALLBACK
 # ============================================================================
 
 st.markdown("---")
@@ -642,4 +642,16 @@ st.markdown("""
     Developed for Course: Foundation Engineering and Design (21CEE301T) | Academic Demonstration Software
 </div>
 """, unsafe_allow_html=True)
+
+
+# WSGI / Serverless entrypoint compatibility
+def handler(environ, start_response):
+    status = '200 OK'
+    response_headers = [('Content-type', 'text/html; charset=utf-8')]
+    start_response(status, response_headers)
+    return [b'GeoSmart AI - 3D Pile Foundation Simulator']
+
+app = handler
+application = handler
+
 

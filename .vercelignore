@@ -1,0 +1,8 @@
+# Vercel deployment exclusions
+# Prevents Vercel from treating Streamlit and Python modules as serverless functions
+app.py
+core/
+tests/
+Dockerfile
+requirements.txt
+sample_data/
