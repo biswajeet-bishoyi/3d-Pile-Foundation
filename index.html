@@ -515,33 +515,112 @@
         .metric-value { font-size: 20px; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); }
         .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
-        /* Clean Tabs Navigation with NO scrollbars */
-        .tabs-nav {
+        /* View Selector Dropdown Bar (Replaces horizontal sliding tabs) */
+        .view-selector-container {
             display: flex;
-            border-bottom: 2px solid var(--border);
-            margin-bottom: 20px;
-            gap: 8px;
-            overflow-x: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .tabs-nav::-webkit-scrollbar {
-            display: none;
-        }
-        .tab-btn {
+            justify-content: space-between;
+            align-items: center;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
             padding: 10px 16px;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            background: none;
-            border: none;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-            white-space: nowrap;
-            transition: all 0.15s;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            gap: 14px;
+            flex-wrap: wrap;
         }
-        .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .view-selector-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 260px;
+        }
+        .view-selector-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .custom-select-wrapper {
+            position: relative;
+            flex: 1;
+            max-width: 520px;
+        }
+        .view-dropdown {
+            width: 100%;
+            padding: 9px 36px 9px 13px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-main);
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            transition: all 0.2s ease;
+        }
+        .view-dropdown:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        .view-dropdown:hover {
+            border-color: var(--primary);
+        }
+        .select-chevron {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .view-nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .view-nav-btn {
+            padding: 7px 13px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .view-nav-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .view-step-indicator {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 6px 10px;
+            border-radius: 6px;
+            min-width: 48px;
+            text-align: center;
+        }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
@@ -896,15 +975,30 @@
             </div>
         </div>
 
-        <!-- TABS (Clean no-scrollbar design) -->
-        <div class="tabs-nav">
-            <button class="tab-btn active" onclick="switchTab(0)">🌐 3D Conceptual Model</button>
-            <button class="tab-btn" onclick="switchTab(1)">📈 Engineering Charts</button>
-            <button class="tab-btn" onclick="switchTab(2)">📉 Load-Settlement Response</button>
-            <button class="tab-btn" onclick="switchTab(3)">📐 Step-by-Step Derivations</button>
-            <button class="tab-btn" onclick="switchTab(4)">🧠 Geotechnical Insights</button>
-            <button class="tab-btn" onclick="switchTab(5)">📚 Textbook Verification</button>
-            <button class="tab-btn" onclick="switchTab(6)">📄 Export & Reports</button>
+        <!-- MODULE VIEW DROPDOWN SELECTOR (Replaces horizontal sliding tabs) -->
+        <div class="view-selector-container">
+            <div class="view-selector-left">
+                <label for="viewSelect" class="view-selector-label">
+                    <span>📑 Module:</span>
+                </label>
+                <div class="custom-select-wrapper">
+                    <select id="viewSelect" class="view-dropdown" onchange="switchTab(parseInt(this.value))">
+                        <option value="0" selected>🌐 1. Interactive 3D Conceptual Model & Stress Vectors</option>
+                        <option value="1">📈 2. Engineering Capacity Charts & Sensitivity (L, D)</option>
+                        <option value="2">📉 3. Load-Settlement Response (Chin-Kondner Model)</option>
+                        <option value="3">📐 4. Step-by-Step Geotechnical Derivations</option>
+                        <option value="4">🧠 5. Geotechnical AI Diagnostic Insights</option>
+                        <option value="5">📚 6. Textbook Verification Benchmarks (Das, Meyerhof)</option>
+                        <option value="6">📄 7. Calculation Report Summary & Export</option>
+                    </select>
+                    <div class="select-chevron">▾</div>
+                </div>
+            </div>
+            <div class="view-nav-buttons">
+                <button type="button" class="view-nav-btn" onclick="navigateTab(-1)" title="Previous Analysis Module">‹ Prev</button>
+                <span class="view-step-indicator" id="viewStepIndicator">1 / 7</span>
+                <button type="button" class="view-nav-btn" onclick="navigateTab(1)" title="Next Analysis Module">Next ›</button>
+            </div>
         </div>
 
         <!-- TAB 0: UPGRADED 3D MODEL SPACE -->
@@ -1296,10 +1390,30 @@
             return 29.0;
         }
 
+        let currentActiveTab = 0;
+        const totalTabs = 7;
+
         function switchTab(index) {
-            document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
+            index = Math.max(0, Math.min(totalTabs - 1, index));
+            currentActiveTab = index;
+
             document.querySelectorAll('.tab-content').forEach((tc, i) => tc.classList.toggle('active', i === index));
+
+            const viewSelect = document.getElementById('viewSelect');
+            if (viewSelect && parseInt(viewSelect.value) !== index) {
+                viewSelect.value = index;
+            }
+
+            const stepInd = document.getElementById('viewStepIndicator');
+            if (stepInd) {
+                stepInd.textContent = `${index + 1} / ${totalTabs}`;
+            }
+
             window.dispatchEvent(new Event('resize'));
+        }
+
+        function navigateTab(direction) {
+            switchTab(currentActiveTab + direction);
         }
 
         function toggleSoilControls() {
