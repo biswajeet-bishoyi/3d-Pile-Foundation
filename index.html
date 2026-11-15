@@ -117,7 +117,7 @@
         }
         .btn-primary:hover { background: var(--primary-hover); }
 
-        /* Theme Toggle Button */
+        /* Theme Toggle Buttons */
         .theme-toggle-btn {
             display: inline-flex;
             align-items: center;
@@ -157,19 +157,78 @@
             transform: rotate(20deg);
         }
 
+        /* 3D Tool Button Ribbon */
+        .btn-tool {
+            padding: 5px 11px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn-tool:hover {
+            background: var(--surface);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-tool.active {
+            background: var(--primary);
+            color: #FFF;
+            border-color: var(--primary);
+        }
+
+        /* 3D Model Legend Cards */
+        .model-legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border);
+        }
+        .legend-card {
+            background: var(--bg);
+            padding: 10px 14px;
+            border-radius: 6px;
+            box-shadow: var(--shadow);
+        }
+        .legend-title {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .legend-val {
+            font-size: 15px;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--text-main);
+        }
+        .legend-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+
         /* Main Content */
         main.content {
             flex: 1;
-            padding: 30px 40px;
+            padding: 24px 36px;
             overflow-y: auto;
         }
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
-        .header-title { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+        .header-title { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 4px; letter-spacing: -0.5px; }
         .header-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; }
         .disclaimer-banner {
             background: var(--warning-bg);
@@ -178,7 +237,7 @@
             padding: 10px 14px;
             border-radius: var(--radius);
             font-size: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
         [data-theme="dark"] .disclaimer-banner {
             border-color: rgba(245, 158, 11, 0.3);
@@ -204,7 +263,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
             gap: 14px;
-            margin-bottom: 24px;
+            margin-bottom: 22px;
         }
         .metric-card {
             background: var(--surface);
@@ -217,13 +276,18 @@
         .metric-value { font-size: 20px; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); }
         .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
 
-        /* Tabs */
+        /* Clean Tabs Navigation with NO scrollbars */
         .tabs-nav {
             display: flex;
             border-bottom: 2px solid var(--border);
             margin-bottom: 20px;
             gap: 8px;
             overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .tabs-nav::-webkit-scrollbar {
+            display: none;
         }
         .tab-btn {
             padding: 10px 16px;
@@ -478,7 +542,7 @@
             </div>
         </div>
 
-        <!-- TABS -->
+        <!-- TABS (Clean no-scrollbar design) -->
         <div class="tabs-nav">
             <button class="tab-btn active" onclick="switchTab(0)">🌐 3D Conceptual Model</button>
             <button class="tab-btn" onclick="switchTab(1)">📈 Engineering Charts</button>
@@ -489,14 +553,53 @@
             <button class="tab-btn" onclick="switchTab(6)">📄 Export & Reports</button>
         </div>
 
-        <!-- TAB 0: 3D MODEL -->
+        <!-- TAB 0: UPGRADED 3D MODEL SPACE -->
         <div class="tab-content active" id="tab0">
-            <div class="card">
-                <div class="card-title">Interactive 3D Conceptual Model (Plotly 3D)</div>
-                <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">
-                    Rotate, zoom, and pan to inspect column load transfer, pile cap slab, pile cylinders, and force vectors.
-                </p>
-                <div id="plot3d" style="width: 100%; height: 580px;"></div>
+            <div class="card" style="padding: 16px 20px;">
+                <!-- Toolbar for 3D View Controls -->
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                    <div>
+                        <div class="card-title" style="margin: 0 0 2px 0;">Interactive 3D Foundation Model</div>
+                        <div style="font-size: 12px; color: var(--text-muted);">
+                            Inspect vertical axial load transfer: Column &rarr; Cap &rarr; Pile Shaft Friction &rarr; Toe End-Bearing.
+                        </div>
+                    </div>
+                    <!-- View Preset Buttons -->
+                    <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                        <button class="btn-tool active" id="btnViewIso" onclick="set3DCamera('default')" title="Default 3D Isometric View">🔄 Isometric</button>
+                        <button class="btn-tool" id="btnViewFront" onclick="set3DCamera('front')" title="Elevation View: Soil Strata & Depth">👁️ Elevation</button>
+                        <button class="btn-tool" id="btnViewTop" onclick="set3DCamera('top')" title="Plan View: Pile Layout & Spacing">⬆️ Plan View</button>
+                        <button class="btn-tool" id="btnToggleSoil" onclick="toggleSoilStrata()" title="Toggle Semi-Transparent Soil Strata Volume">🪨 Soil Strata: ON</button>
+                        <button class="btn-tool" id="btnToggleArrows" onclick="toggleForceArrows()" title="Toggle Shaft and Base Resistance Force Vectors">🏹 Vectors: ON</button>
+                    </div>
+                </div>
+
+                <!-- 3D Plotly Canvas -->
+                <div id="plot3d" style="width: 100%; height: 600px; border-radius: var(--radius); overflow: hidden;"></div>
+
+                <!-- 3D Foundation Component Badges -->
+                <div class="model-legend-grid">
+                    <div class="legend-card" style="border-left: 3px solid #EF4444;">
+                        <div class="legend-title" style="color: #EF4444;">🔴 Applied Column Load (P ↓)</div>
+                        <div class="legend-val" id="legendP">200.0 kN</div>
+                        <div class="legend-desc">Vertical compressive load from superstructure onto pile cap.</div>
+                    </div>
+                    <div class="legend-card" style="border-left: 3px solid #22C55E;">
+                        <div class="legend-title" style="color: #22C55E;">🟢 Shaft Resistance (Q_s ↑)</div>
+                        <div class="legend-val" id="legendQs">593.8 kN (91.2%)</div>
+                        <div class="legend-desc">Skin friction mobilized along the embedded pile shaft.</div>
+                    </div>
+                    <div class="legend-card" style="border-left: 3px solid #3B82F6;">
+                        <div class="legend-title" style="color: #3B82F6;">🔵 Base Resistance (Q_b ↑)</div>
+                        <div class="legend-val" id="legendQb">57.3 kN (8.8%)</div>
+                        <div class="legend-desc">End bearing mobilized at the pile toe in bearing stratum.</div>
+                    </div>
+                    <div class="legend-card" style="border-left: 3px solid var(--primary);">
+                        <div class="legend-title" style="color: var(--primary);">📐 Geometry & Spacing</div>
+                        <div class="legend-val" id="legendGeom">D = 0.45m | L = 15.0m</div>
+                        <div class="legend-desc" id="legendLayout">Single Vertical Pile (L/D = 33.3)</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -607,6 +710,42 @@
 
     <!-- CALCULATION & PLOTLY ENGINE SCRIPT -->
     <script>
+        // 3D Visualization Options State
+        let showSoilStrata = true;
+        let showForceArrows = true;
+        let currentCameraMode = 'default';
+
+        function toggleSoilStrata() {
+            showSoilStrata = !showSoilStrata;
+            const btn = document.getElementById('btnToggleSoil');
+            if (btn) {
+                btn.innerHTML = showSoilStrata ? '🪨 Soil Strata: ON' : '🪨 Soil Strata: OFF';
+                btn.classList.toggle('active', showSoilStrata);
+            }
+            render3D();
+        }
+
+        function toggleForceArrows() {
+            showForceArrows = !showForceArrows;
+            const btn = document.getElementById('btnToggleArrows');
+            if (btn) {
+                btn.innerHTML = showForceArrows ? '🏹 Vectors: ON' : '🏹 Vectors: OFF';
+                btn.classList.toggle('active', showForceArrows);
+            }
+            render3D();
+        }
+
+        function set3DCamera(mode) {
+            currentCameraMode = mode;
+            document.querySelectorAll('.btn-tool').forEach(btn => {
+                if (btn.id === 'btnViewIso' && mode === 'default') btn.classList.add('active');
+                else if (btn.id === 'btnViewFront' && mode === 'front') btn.classList.add('active');
+                else if (btn.id === 'btnViewTop' && mode === 'top') btn.classList.add('active');
+                else if (btn.id.startsWith('btnView')) btn.classList.remove('active');
+            });
+            render3D();
+        }
+
         // Theme Engine
         function initTheme() {
             const savedTheme = localStorage.getItem('geosmart_theme');
@@ -811,6 +950,13 @@
             document.getElementById('kpiLD').textContent = (L / D).toFixed(1);
             document.getElementById('kpiAs').textContent = 'As = ' + As.toFixed(1) + ' m²';
 
+            // Update 3D Legend Badges
+            document.getElementById('legendP').textContent = P.toFixed(1) + ' kN';
+            document.getElementById('legendQs').textContent = Qs.toFixed(1) + ' kN (' + ((Qs/Qult)*100).toFixed(1) + '%)';
+            document.getElementById('legendQb').textContent = Qb.toFixed(1) + ' kN (' + ((Qb/Qult)*100).toFixed(1) + '%)';
+            document.getElementById('legendGeom').textContent = `D = ${D.toFixed(2)}m | L = ${L.toFixed(1)}m`;
+            document.getElementById('legendLayout').textContent = isGroup ? `${rows}×${cols} Group (${totalPiles} Piles, s=${spacing.toFixed(2)}m)` : `Single Vertical Pile (L/D = ${(L/D).toFixed(1)})`;
+
             // Status bar
             const sb = document.getElementById('statusBar');
             sb.className = 'status-banner ' + (isSafe ? (UR > 0.85 ? 'status-warning' : 'status-safe') : 'status-danger');
@@ -824,7 +970,18 @@
             renderReport();
         }
 
-        // Render 3D Model in Plotly with Dark / Light Mode Support
+        // Helper to generate 3D Box vertices and triangles
+        function getBoxMesh(xMin, xMax, yMin, yMax, zMin, zMax) {
+            const x = [xMin, xMax, xMax, xMin, xMin, xMax, xMax, xMin];
+            const y = [yMin, yMin, yMax, yMax, yMin, yMin, yMax, yMax];
+            const z = [zMin, zMin, zMin, zMin, zMax, zMax, zMax, zMax];
+            const i = [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2];
+            const j = [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3];
+            const k = [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6];
+            return { x, y, z, i, j, k };
+        }
+
+        // UPGRADED 3D MODEL ENGINE IN PLOTLY
         function render3D() {
             const c = latestCalc;
             const radius = c.D / 2.0;
@@ -851,89 +1008,129 @@
 
             const traces = [];
 
-            // Ground plane (Z = 0)
-            const extent = Math.max(n * spacing, m * spacing, 4.0);
+            // Balanced Bounding Extent
+            const capOverhang = Math.max(0.4 * c.D, 0.35);
+            const capXMin = Math.min(...xOffsets) - radius - capOverhang;
+            const capXMax = Math.max(...xOffsets) + radius + capOverhang;
+            const capYMin = Math.min(...yOffsets) - radius - capOverhang;
+            const capYMax = Math.max(...yOffsets) + radius + capOverhang;
+            const capH = Math.max(0.6 * c.D, 0.7);
+
+            const extentX = Math.max(Math.abs(capXMin), Math.abs(capXMax), 1.6) + 1.2 * c.D;
+            const extentY = Math.max(Math.abs(capYMin), Math.abs(capYMax), 1.6) + 1.2 * c.D;
+
+            // 1. GROUND SURFACE PLANE (Z = 0)
             traces.push({
                 type: 'surface',
-                x: [[-extent, extent], [-extent, extent]],
-                y: [[-extent, -extent], [extent, extent]],
+                x: [[-extentX, extentX], [-extentX, extentX]],
+                y: [[-extentY, -extentY], [extentY, extentY]],
                 z: [[0, 0], [0, 0]],
-                colorscale: isDark ? [[0, '#4B5563'], [1, '#6B7280']] : [[0, '#8D6E63'], [1, '#A1887F']],
+                colorscale: isDark ? [[0, '#374151'], [1, '#4B5563']] : [[0, '#A8A29E'], [1, '#D6D3D1']],
                 showscale: false,
-                opacity: 0.35,
+                opacity: 0.5,
                 hoverinfo: 'text',
                 text: 'Ground Surface (GL ±0.00m)'
             });
 
-            // Pile cap
-            const capH = 0.8;
-            const overhang = Math.max(0.4 * c.D, 0.3);
-            const xMin = Math.min(...xOffsets) - radius - overhang;
-            const xMax = Math.max(...xOffsets) + radius + overhang;
-            const yMin = Math.min(...yOffsets) - radius - overhang;
-            const yMax = Math.max(...yOffsets) + radius + overhang;
+            // 2. SOIL STRATA VOLUMES (When Toggled ON)
+            if (showSoilStrata) {
+                const zStratumBoundary = -0.55 * c.L;
+                const zSoilBottom = -(c.L + 1.8 * c.D);
 
+                // Stratum 1: Upper Stratum (0 to -0.55L)
+                const s1 = getBoxMesh(-extentX, extentX, -extentY, extentY, zStratumBoundary, 0.0);
+                traces.push({
+                    type: 'mesh3d',
+                    x: s1.x, y: s1.y, z: s1.z, i: s1.i, j: s1.j, k: s1.k,
+                    color: isDark ? '#3B82F6' : '#BAA598',
+                    opacity: isDark ? 0.08 : 0.12,
+                    hoverinfo: 'text',
+                    text: `Upper Soil Layer (0 to ${zStratumBoundary.toFixed(1)}m): ${c.soilType}`
+                });
+
+                // Stratum 2: Deep Bearing Stratum (-0.55L to bottom)
+                const s2 = getBoxMesh(-extentX, extentX, -extentY, extentY, zSoilBottom, zStratumBoundary);
+                traces.push({
+                    type: 'mesh3d',
+                    x: s2.x, y: s2.y, z: s2.z, i: s2.i, j: s2.j, k: s2.k,
+                    color: isDark ? '#10B981' : '#8D7B68',
+                    opacity: isDark ? 0.12 : 0.18,
+                    hoverinfo: 'text',
+                    text: `Deep Bearing Stratum (${zStratumBoundary.toFixed(1)}m to ${zSoilBottom.toFixed(1)}m)`
+                });
+
+                // Boundary ring line at stratum interface
+                traces.push({
+                    type: 'scatter3d',
+                    mode: 'lines',
+                    x: [-extentX, extentX, extentX, -extentX, -extentX],
+                    y: [-extentY, -extentY, extentY, extentY, -extentY],
+                    z: [zStratumBoundary, zStratumBoundary, zStratumBoundary, zStratumBoundary, zStratumBoundary],
+                    line: { color: isDark ? '#60A5FA' : '#6B7280', width: 2, dash: 'dash' },
+                    hoverinfo: 'text',
+                    text: `Soil Layer Interface (${zStratumBoundary.toFixed(1)}m)`
+                });
+            }
+
+            // 3. CONCRETE PILE CAP (Crisp 3D Box)
+            const capMesh = getBoxMesh(capXMin, capXMax, capYMin, capYMax, 0.0, capH);
             traces.push({
                 type: 'mesh3d',
-                x: [xMin, xMax, xMax, xMin, xMin, xMax, xMax, xMin],
-                y: [yMin, yMin, yMax, yMax, yMin, yMin, yMax, yMax],
-                z: [0, 0, 0, 0, capH, capH, capH, capH],
-                i: [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
-                j: [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
-                k: [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
-                color: isDark ? '#475569' : '#78909C',
-                opacity: 0.9,
-                name: 'Pile Cap'
-            });
-
-            // Column
-            const colW = Math.max(0.5 * c.D, 0.4);
-            const colH = 2.0;
-            traces.push({
-                type: 'mesh3d',
-                x: [-colW, colW, colW, -colW, -colW, colW, colW, -colW],
-                y: [-colW, -colW, colW, colW, -colW, -colW, colW, colW],
-                z: [capH, capH, capH, capH, capH + colH, capH + colH, capH + colH, capH + colH],
-                i: [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
-                j: [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
-                k: [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
-                color: isDark ? '#334155' : '#546E7A',
+                x: capMesh.x, y: capMesh.y, z: capMesh.z, i: capMesh.i, j: capMesh.j, k: capMesh.k,
+                color: isDark ? '#64748B' : '#78909C',
                 opacity: 0.95,
-                name: 'Column'
+                hoverinfo: 'text',
+                text: `Reinforced Concrete Pile Cap<br>Thickness: ${capH.toFixed(2)}m<br>Dimensions: ${(capXMax-capXMin).toFixed(2)}m × ${(capYMax-capYMin).toFixed(2)}m`
             });
 
-            // Applied load arrow
+            // 4. SUPERSTRUCTURE COLUMN
+            const colW = Math.max(0.55 * c.D, 0.45);
+            const colH = Math.max(1.8, 2.2 * c.D);
+            const colMesh = getBoxMesh(-colW/2, colW/2, -colW/2, colW/2, capH, capH + colH);
+            traces.push({
+                type: 'mesh3d',
+                x: colMesh.x, y: colMesh.y, z: colMesh.z, i: colMesh.i, j: colMesh.j, k: colMesh.k,
+                color: isDark ? '#475569' : '#546E7A',
+                opacity: 0.98,
+                hoverinfo: 'text',
+                text: `Superstructure Column<br>Applied Axial Load: ${c.P.toFixed(1)} kN`
+            });
+
+            // 5. APPLIED COMPRESSIVE LOAD VECTOR (Prominent Downward Red Arrow)
+            const arrowTopZ = capH + colH + Math.max(2.2, 1.8 * c.D);
+            const arrowTipZ = capH + colH;
             traces.push({
                 type: 'scatter3d',
                 mode: 'lines+text',
-                x: [0, 0], y: [0, 0], z: [capH + colH + 2.0, capH + colH + 0.3],
-                line: { color: '#EF4444', width: 8 },
-                text: ['', '<b>P = ' + c.P.toFixed(1) + ' kN ↓</b>'],
+                x: [0, 0], y: [0, 0], z: [arrowTopZ, arrowTipZ + 0.4],
+                line: { color: '#EF4444', width: 9 },
+                text: ['', `<b>P = ${c.P.toFixed(1)} kN ↓</b>`],
                 textposition: 'top center',
                 textfont: { color: '#EF4444', size: 14 },
-                name: 'Applied Load'
+                hoverinfo: 'text'
             });
 
-            // Arrow cone tip
             traces.push({
                 type: 'cone',
-                x: [0], y: [0], z: [capH + colH + 0.3],
-                u: [0], v: [0], w: [-0.8],
-                sizemode: 'scaled', sizeref: 0.6,
+                x: [0], y: [0], z: [arrowTipZ + 0.35],
+                u: [0], v: [0], w: [-0.85],
+                sizemode: 'scaled', sizeref: 0.7,
                 colorscale: [[0, '#EF4444'], [1, '#EF4444']],
                 showscale: false,
-                name: 'Load Vector'
+                hoverinfo: 'text',
+                text: `Applied Column Load P = ${c.P.toFixed(1)} kN`
             });
 
-            // Cylinders for each pile
+            // 6. PILE CYLINDERS (Solid, smooth cylindrical geometry)
             centers.forEach((cen, idx) => {
                 const theta = [];
-                const nPts = 20;
+                const nPts = 28;
                 for (let k = 0; k <= nPts; k++) theta.push((2 * Math.PI * k) / nPts);
 
                 const xGrid = [], yGrid = [], zGrid = [];
-                for (let zi = 0; zi <= 1; zi++) {
-                    const zVal = zi === 0 ? 0 : -c.L;
+                const zLevels = [0.0, -0.33 * c.L, -0.66 * c.L, -c.L];
+                for (let zi = 0; zi < zLevels.length; zi++) {
+                    const zVal = zLevels[zi];
                     const xRow = [], yRow = [], zRow = [];
                     for (let ti = 0; ti <= nPts; ti++) {
                         xRow.push(cen.x + radius * Math.cos(theta[ti]));
@@ -948,42 +1145,146 @@
                 traces.push({
                     type: 'surface',
                     x: xGrid, y: yGrid, z: zGrid,
-                    colorscale: isDark ? [[0, '#374151'], [1, '#4B5563']] : [[0, '#455A64'], [1, '#607D8B']],
+                    colorscale: isDark ? [[0, '#38BDF8'], [1, '#0284C7']] : [[0, '#475569'], [1, '#64748B']],
                     showscale: false,
-                    opacity: 0.95,
-                    name: 'Pile #' + (idx + 1)
+                    opacity: 0.96,
+                    hoverinfo: 'text',
+                    text: `Pile #${idx + 1}<br>Diameter: ${c.D.toFixed(2)}m<br>Length: ${c.L.toFixed(1)}m<br>Type: ${c.pileType}`
                 });
 
-                // End bearing cone at toe pointing UP
+                // Pile toe circular cap
+                const toeX = [cen.x], toeY = [cen.y], toeZ = [-c.L];
+                for (let ti = 0; ti <= nPts; ti++) {
+                    toeX.push(cen.x + radius * Math.cos(theta[ti]));
+                    toeY.push(cen.y + radius * Math.sin(theta[ti]));
+                    toeZ.push(-c.L);
+                }
                 traces.push({
-                    type: 'cone',
-                    x: [cen.x], y: [cen.y], z: [-c.L],
-                    u: [0], v: [0], w: [0.5],
-                    sizemode: 'scaled', sizeref: 0.5,
-                    colorscale: [[0, '#3B82F6'], [1, '#3B82F6']],
-                    showscale: false,
-                    name: 'Base Resistance'
+                    type: 'scatter3d',
+                    mode: 'lines',
+                    x: toeX, y: toeY, z: toeZ,
+                    line: { color: isDark ? '#0284C7' : '#1E293B', width: 4 },
+                    hoverinfo: 'text',
+                    text: `Pile #${idx + 1} Toe (End-Bearing Base)`
                 });
+
+                // 7. SHAFT FRICTION VECTORS (Upward Green Arrows ↑)
+                if (showForceArrows) {
+                    const arrowDepths = [-0.25 * c.L, -0.50 * c.L, -0.75 * c.L];
+                    const arrowLength = Math.max(0.08 * c.L, 0.8);
+
+                    arrowDepths.forEach(dz => {
+                        const angles = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2];
+                        angles.forEach(ang => {
+                            const ax = cen.x + (radius + 0.08 * c.D) * Math.cos(ang);
+                            const ay = cen.y + (radius + 0.08 * c.D) * Math.sin(ang);
+
+                            // Stem
+                            traces.push({
+                                type: 'scatter3d',
+                                mode: 'lines',
+                                x: [ax, ax], y: [ay, ay], z: [dz - arrowLength, dz],
+                                line: { color: '#22C55E', width: 4 },
+                                hoverinfo: 'skip'
+                            });
+
+                            // Cone pointing UP
+                            traces.push({
+                                type: 'cone',
+                                x: [ax], y: [ay], z: [dz],
+                                u: [0], v: [0], w: [0.4],
+                                sizemode: 'scaled', sizeref: 0.35,
+                                colorscale: [[0, '#22C55E'], [1, '#22C55E']],
+                                showscale: false,
+                                hoverinfo: 'text',
+                                text: `Shaft Friction Q_s = ${c.Qs.toFixed(1)} kN (Mobilized upward)`
+                            });
+                        });
+                    });
+
+                    // 8. BASE RESISTANCE VECTOR (Upward Blue Cone at Pile Toe ↑)
+                    traces.push({
+                        type: 'scatter3d',
+                        mode: 'lines',
+                        x: [cen.x, cen.x], y: [cen.y, cen.y], z: [-c.L - 0.18 * c.L, -c.L],
+                        line: { color: '#3B82F6', width: 7 },
+                        hoverinfo: 'skip'
+                    });
+
+                    traces.push({
+                        type: 'cone',
+                        x: [cen.x], y: [cen.y], z: [-c.L],
+                        u: [0], v: [0], w: [0.65],
+                        sizemode: 'scaled', sizeref: 0.55,
+                        colorscale: [[0, '#3B82F6'], [1, '#3B82F6']],
+                        showscale: false,
+                        hoverinfo: 'text',
+                        text: `End-Bearing Resistance Q_b = ${c.Qb.toFixed(1)} kN`
+                    });
+                }
             });
 
+            // 9. ELEVATION & DIMENSION RULERS
+            // Elevation callouts on the side
+            const rulerX = -extentX * 0.95;
+            const rulerY = 0.0;
+            traces.push({
+                type: 'scatter3d',
+                mode: 'lines+text',
+                x: [rulerX, rulerX, rulerX],
+                y: [rulerY, rulerY, rulerY],
+                z: [0.0, -0.5 * c.L, -c.L],
+                line: { color: isDark ? '#94A3B8' : '#64748B', width: 2, dash: 'dot' },
+                text: ['GL ±0.00m', `Mid -${(c.L/2).toFixed(1)}m`, `Toe -${c.L.toFixed(1)}m`],
+                textposition: 'middle left',
+                textfont: { color: isDark ? '#94A3B8' : '#475569', size: 11 },
+                hoverinfo: 'text'
+            });
+
+            // Length Dimension Callout
+            traces.push({
+                type: 'scatter3d',
+                mode: 'text',
+                x: [rulerX], y: [rulerY], z: [-0.25 * c.L],
+                text: [`<b>L = ${c.L.toFixed(1)} m</b>`],
+                textfont: { color: isDark ? '#60A5FA' : '#1E40AF', size: 12 },
+                hoverinfo: 'skip'
+            });
+
+            // Camera presets
+            let cameraEye = { x: 1.35, y: -1.35, z: 0.75 };
+            let cameraCenter = { x: 0, y: 0, z: -0.25 };
+
+            if (currentCameraMode === 'front') {
+                cameraEye = { x: 0.01, y: -2.3, z: 0.0 };
+                cameraCenter = { x: 0, y: 0, z: -0.35 };
+            } else if (currentCameraMode === 'top') {
+                cameraEye = { x: 0.01, y: 0.01, z: 2.5 };
+                cameraCenter = { x: 0, y: 0, z: 0 };
+            }
+
             const layout = {
-                title: {
-                    text: '<b>Conceptual 3D Foundation Model</b> (Plotly 3D)',
-                    font: { color: textColor, size: 14 }
-                },
                 paper_bgcolor: paperBg,
                 scene: {
-                    xaxis: { title: 'X (m)', backgroundcolor: sceneBg, gridcolor: gridColor, color: textColor },
-                    yaxis: { title: 'Y (m)', backgroundcolor: sceneBg, gridcolor: gridColor, color: textColor },
-                    zaxis: { title: 'Z (m)', backgroundcolor: isDark ? '#0B0F19' : '#F1F5F9', gridcolor: gridColor, color: textColor },
-                    aspectmode: 'data',
-                    camera: { eye: { x: 1.8, y: -1.8, z: 1.2 } }
+                    xaxis: { title: 'X (m)', backgroundcolor: sceneBg, gridcolor: gridColor, color: textColor, showbackground: true },
+                    yaxis: { title: 'Y (m)', backgroundcolor: sceneBg, gridcolor: gridColor, color: textColor, showbackground: true },
+                    zaxis: { title: 'Elevation Z (m)', backgroundcolor: isDark ? '#0F172A' : '#F1F5F9', gridcolor: gridColor, color: textColor, showbackground: true },
+                    aspectmode: 'manual',
+                    aspectratio: { x: 1.0, y: 1.0, z: 1.6 },
+                    camera: { eye: cameraEye, center: cameraCenter }
                 },
-                margin: { l: 0, r: 0, b: 0, t: 40 },
+                margin: { l: 0, r: 0, b: 0, t: 10 },
                 showlegend: false
             };
 
-            Plotly.react('plot3d', traces, layout);
+            const config = {
+                responsive: true,
+                displayModeBar: true,
+                displaylogo: false,
+                modeBarButtonsToRemove: ['toImage', 'sendDataToCloud']
+            };
+
+            Plotly.react('plot3d', traces, layout, config);
         }
 
         // Render 2D Charts with Dark / Light Mode Support
