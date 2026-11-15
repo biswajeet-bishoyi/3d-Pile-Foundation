@@ -455,11 +455,20 @@
             line-height: 1.4;
         }
 
-        /* Main Content */
+        /* Main Content (Strictly no horizontal sliding) */
         main.content {
             flex: 1;
-            padding: 24px 36px;
+            padding: 20px 28px;
             overflow-y: auto;
+            overflow-x: hidden;
+            max-width: calc(100vw - 375px);
+            box-sizing: border-box;
+        }
+        @media (max-width: 1024px) {
+            main.content {
+                max-width: 100vw;
+                padding: 16px;
+            }
         }
         .top-bar {
             display: flex;
@@ -657,8 +666,21 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* Cards & Grids */
-        .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        /* Cards & Responsive Grids (Strictly No horizontal scroll) */
+        .charts-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 18px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        @media (max-width: 1250px) {
+            .charts-row {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -666,6 +688,9 @@
             padding: 18px;
             margin-bottom: 20px;
             box-shadow: var(--shadow);
+            min-width: 0;
+            overflow: hidden;
+            box-sizing: border-box;
         }
         .card-title { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
 
@@ -1008,13 +1033,13 @@
             </div>
         </div>
 
-        <!-- MODULE VIEW DROPDOWN SELECTOR (Replaces horizontal sliding tabs) -->
+        <!-- MODULE VIEW DROPDOWN SELECTOR -->
         <div class="view-selector-container">
-            <div class="view-selector-left">
+            <div class="view-selector-left" style="width: 100%;">
                 <label for="viewSelect" class="view-selector-label">
-                    <span>📑 Module:</span>
+                    <span>📑 Module View:</span>
                 </label>
-                <div class="custom-select-wrapper">
+                <div class="custom-select-wrapper" style="max-width: 100%;">
                     <select id="viewSelect" class="view-dropdown" onchange="switchTab(parseInt(this.value))">
                         <option value="0" selected>🌐 1. Interactive 3D Conceptual Model & Stress Vectors</option>
                         <option value="1">📈 2. Engineering Capacity Charts & Sensitivity (L, D)</option>
@@ -1026,11 +1051,6 @@
                     </select>
                     <div class="select-chevron">▾</div>
                 </div>
-            </div>
-            <div class="view-nav-buttons">
-                <button type="button" class="view-nav-btn" onclick="navigateTab(-1)" title="Previous Analysis Module">‹ Prev</button>
-                <span class="view-step-indicator" id="viewStepIndicator">1 / 7</span>
-                <button type="button" class="view-nav-btn" onclick="navigateTab(1)" title="Next Analysis Module">Next ›</button>
             </div>
         </div>
 
@@ -1086,14 +1106,29 @@
 
         <!-- TAB 1: CHARTS -->
         <div class="tab-content" id="tab1">
-            <div style="margin-bottom: 16px;">
-                <div class="card-title" style="margin-bottom: 4px; font-size: 16px;">📊 Geotechnical Capacity & Parametric Sensitivity Analytics</div>
-                <div style="font-size: 12px; color: var(--text-muted);">
-                    Evaluate axial load safety margins, load-transfer distribution (skin friction vs. end bearing), and geometric sensitivity.
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; background: var(--surface); border: 1px solid var(--border); padding: 12px 16px; border-radius: var(--radius); box-shadow: var(--shadow);">
+                <div>
+                    <div class="card-title" style="margin: 0 0 2px 0; font-size: 15px;">📊 Engineering Capacity & Sensitivity Charts</div>
+                    <div style="font-size: 11px; color: var(--text-muted);">
+                        Interactive safety checks, skin friction vs. base end bearing, and geometric sensitivity.
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label style="font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Chart View:</label>
+                    <div class="custom-select-wrapper" style="max-width: 320px;">
+                        <select id="graphViewSelect" class="view-dropdown" style="padding: 7px 32px 7px 10px; font-size: 12.5px;" onchange="filterGraphCards(this.value)">
+                            <option value="all" selected>📑 All 4 Charts (Grid Overview)</option>
+                            <option value="loadCap">📊 1. Applied Load vs. Capacity</option>
+                            <option value="donut">🍩 2. Resistance Breakdown Donut</option>
+                            <option value="lenSens">📏 3. Length Sensitivity Curve</option>
+                            <option value="diaSens">🔩 4. Diameter Sensitivity Curve</option>
+                        </select>
+                        <div class="select-chevron">▾</div>
+                    </div>
                 </div>
             </div>
-            <div class="charts-row">
-                <div class="card">
+            <div class="charts-row" id="chartsRow1">
+                <div class="card" id="cardLoadCap">
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
                         <div class="card-title" style="margin: 0;">Applied Load vs. Allowable Capacity</div>
                         <span id="loadCapRatioBadge" style="font-size: 11px; font-weight: 700; color: var(--success); font-family: var(--font-mono);">UR = 76.8%</span>
@@ -1105,7 +1140,7 @@
                         <span>FS: <b id="summaryFS">2.50</b></span>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" id="cardDonut">
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
                         <div class="card-title" style="margin: 0;">Resistance Breakdown (Shaft vs. Base)</div>
                         <span id="donutDominanceBadge" style="font-size: 11px; font-weight: 700; color: #10B981;">Shaft-Dominated</span>
@@ -1117,8 +1152,8 @@
                     </div>
                 </div>
             </div>
-            <div class="charts-row">
-                <div class="card">
+            <div class="charts-row" id="chartsRow2">
+                <div class="card" id="cardLenSens">
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
                         <div class="card-title" style="margin: 0;">Length Sensitivity Analysis (L vs. Q)</div>
                         <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Range: 4m - 30m</span>
@@ -1128,7 +1163,7 @@
                         💡 <b>Embedment Sensitivity:</b> Skin friction scales linearly with embedment depth <i>L</i>. Diamond marker indicates current design embedment.
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" id="cardDiaSens">
                     <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
                         <div class="card-title" style="margin: 0;">Diameter Sensitivity Analysis (D vs. Q)</div>
                         <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Range: 0.25m - 1.50m</span>
@@ -1172,40 +1207,42 @@
         <div class="tab-content" id="tab5">
             <div class="card">
                 <div class="card-title">📚 Hand-Worked Textbook Verification Benchmarks</div>
-                <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
-                    <thead>
-                        <tr style="background: var(--bg); text-align: left;">
-                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Benchmark Case</th>
-                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Configuration</th>
-                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Hand-Worked Solution</th>
-                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Simulator Output</th>
-                            <th style="padding: 8px 12px; border: 1px solid var(--border);">Parity</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 1: Das (2019) Clay Pile</b></td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">D=0.45m, L=15m, cu=40kPa, α=0.70</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">Qs=593.76 kN, Qb=57.26 kN, Qall=260.41 kN</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">Qs=593.76 kN, Qb=57.26 kN, Qall=260.41 kN</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">100.0% Exact</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 2: Meyerhof Sand Pile</b></td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">D=0.60m, L=14m, φ=34°, Ks=0.70</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">zc=9.0m, Qult=1963.2 kN</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">zc=9.0m, Qult=1963.2 kN</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">Verified</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 3: 2×2 Pile Group</b></td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">4 Piles, s=1.5m (3D), cu=65kPa</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">θ=18.435°, η=0.7952 (79.5%)</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border);">θ=18.435°, η=0.7952</td>
-                            <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">100.0% Exact</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div style="overflow-x: auto; width: 100%;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; min-width: 600px;">
+                        <thead>
+                            <tr style="background: var(--bg); text-align: left;">
+                                <th style="padding: 8px 12px; border: 1px solid var(--border);">Benchmark Case</th>
+                                <th style="padding: 8px 12px; border: 1px solid var(--border);">Configuration</th>
+                                <th style="padding: 8px 12px; border: 1px solid var(--border);">Hand-Worked Solution</th>
+                                <th style="padding: 8px 12px; border: 1px solid var(--border);">Simulator Output</th>
+                                <th style="padding: 8px 12px; border: 1px solid var(--border);">Parity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 1: Das (2019) Clay Pile</b></td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">D=0.45m, L=15m, cu=40kPa, α=0.70</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">Qs=593.76 kN, Qb=57.26 kN, Qall=260.41 kN</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">Qs=593.76 kN, Qb=57.26 kN, Qall=260.41 kN</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">100.0% Exact</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 2: Meyerhof Sand Pile</b></td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">D=0.60m, L=14m, φ=34°, Ks=0.70</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">zc=9.0m, Qult=1963.2 kN</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">zc=9.0m, Qult=1963.2 kN</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">Verified</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);"><b>Case 3: 2×2 Pile Group</b></td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">4 Piles, s=1.5m (3D), cu=65kPa</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">θ=18.435°, η=0.7952 (79.5%)</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border);">θ=18.435°, η=0.7952</td>
+                                <td style="padding: 8px 12px; border: 1px solid var(--border); color: var(--success); font-weight: 700;">100.0% Exact</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -1475,7 +1512,70 @@
                 stepInd.textContent = `${index + 1} / ${totalTabs}`;
             }
 
-            window.dispatchEvent(new Event('resize'));
+            // Immediately resize Plotly charts for clean responsiveness
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+                ['chartLoadCap', 'chartDonut', 'chartLenSens', 'chartDiaSens', 'chartSettle', 'chart3d'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.offsetParent !== null && window.Plotly) {
+                        Plotly.Plots.resize(el);
+                    }
+                });
+            }, 60);
+        }
+
+        function filterGraphCards(mode) {
+            const cardLoad = document.getElementById('cardLoadCap');
+            const cardDonut = document.getElementById('cardDonut');
+            const cardLen = document.getElementById('cardLenSens');
+            const cardDia = document.getElementById('cardDiaSens');
+            const row1 = document.getElementById('chartsRow1');
+            const row2 = document.getElementById('chartsRow2');
+
+            if (!cardLoad || !cardDonut || !cardLen || !cardDia) return;
+
+            if (mode === 'all') {
+                cardLoad.style.display = 'block';
+                cardDonut.style.display = 'block';
+                cardLen.style.display = 'block';
+                cardDia.style.display = 'block';
+                if (row1) {
+                    row1.style.display = 'grid';
+                    row1.style.gridTemplateColumns = '';
+                }
+                if (row2) {
+                    row2.style.display = 'grid';
+                    row2.style.gridTemplateColumns = '';
+                }
+            } else {
+                cardLoad.style.display = (mode === 'loadCap') ? 'block' : 'none';
+                cardDonut.style.display = (mode === 'donut') ? 'block' : 'none';
+                cardLen.style.display = (mode === 'lenSens') ? 'block' : 'none';
+                cardDia.style.display = (mode === 'diaSens') ? 'block' : 'none';
+
+                if (row1) {
+                    row1.style.display = (mode === 'loadCap' || mode === 'donut') ? 'grid' : 'none';
+                    if (mode === 'loadCap' || mode === 'donut') {
+                        row1.style.gridTemplateColumns = '1fr';
+                    }
+                }
+                if (row2) {
+                    row2.style.display = (mode === 'lenSens' || mode === 'diaSens') ? 'grid' : 'none';
+                    if (mode === 'lenSens' || mode === 'diaSens') {
+                        row2.style.gridTemplateColumns = '1fr';
+                    }
+                }
+            }
+
+            setTimeout(() => {
+                window.dispatchEvent(new Event('resize'));
+                ['chartLoadCap', 'chartDonut', 'chartLenSens', 'chartDiaSens'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el && el.offsetParent !== null && window.Plotly) {
+                        Plotly.Plots.resize(el);
+                    }
+                });
+            }, 60);
         }
 
         function navigateTab(direction) {
@@ -2057,6 +2157,7 @@
                 labels: ['Shaft Resistance (Q_s)', 'Base Resistance (Q_b)'],
                 values: [c.Qs, c.Qb],
                 hole: 0.60,
+                domain: { x: [0, 1], y: [0, 1] },
                 marker: {
                     colors: ['#10B981', '#3B82F6'],
                     line: { color: chartBg, width: 2 }
@@ -2068,19 +2169,19 @@
             }], {
                 paper_bgcolor: chartBg,
                 font: { color: fontColor },
-                margin: { l: 20, r: 20, t: 20, b: 40 },
+                margin: { l: 15, r: 15, t: 15, b: 35 },
                 showlegend: true,
                 legend: {
                     orientation: 'h',
                     x: 0.5,
                     xanchor: 'center',
-                    y: -0.12,
+                    y: -0.14,
                     font: { color: fontColor, size: 11 }
                 },
                 annotations: [{
                     text: `<b>${totalQult.toFixed(0)} kN</b><br><span style="font-size:11px;color:${fontMuted}">Ultimate Q_ult</span>`,
                     showarrow: false,
-                    font: { size: 15, color: fontColor },
+                    font: { size: 14, color: fontColor },
                     x: 0.5,
                     y: 0.5
                 }]
