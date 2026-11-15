@@ -1,6 +1,5 @@
 # Vercel deployment exclusions
-# Ignores all Python files and Streamlit modules so Vercel deploys purely as a fast static site
-*.py
+# Ignores large local python modules and tests so Vercel builds instantly
 core/
 tests/
 Dockerfile
