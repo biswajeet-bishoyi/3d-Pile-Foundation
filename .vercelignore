@@ -1,6 +1,6 @@
 # Vercel deployment exclusions
-# Prevents Vercel from treating Streamlit and Python modules as serverless functions
-app.py
+# Ignores all Python files and Streamlit modules so Vercel deploys purely as a fast static site
+*.py
 core/
 tests/
 Dockerfile

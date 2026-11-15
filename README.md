@@ -101,7 +101,7 @@ python tests/run_tests.py
 
 ### 4. Launch the Streamlit Application
 ```bash
-streamlit run app.py
+streamlit run streamlit_app.py
 ```
 Open your browser at `http://localhost:8501`.
 
