@@ -497,23 +497,56 @@
         .status-danger { background: var(--danger-bg); color: var(--danger); border: 1px solid #FCA5A5; }
         .status-warning { background: var(--warning-bg); color: var(--warning); border: 1px solid #FDE68A; }
 
-        /* KPI Metric Cards */
+        /* KPI Metric Cards (Balanced 6-column grid) */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 14px;
-            margin-bottom: 22px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 1400px) {
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
         .metric-card {
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 14px;
+            padding: 12px 14px;
             box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
         }
-        .metric-label { font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-        .metric-value { font-size: 20px; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); }
-        .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border-color: rgba(59, 130, 246, 0.45);
+        }
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+        .metric-card.m-load::before { background: #EF4444; }
+        .metric-card.m-qall::before { background: #3B82F6; }
+        .metric-card.m-qult::before { background: #8B5CF6; }
+        .metric-card.m-qs::before { background: #10B981; }
+        .metric-card.m-qb::before { background: #06B6D4; }
+        .metric-card.m-slender::before { background: #F59E0B; }
+
+        .metric-label { font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
+        .metric-value { font-size: 19px; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); }
+        .metric-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; font-weight: 500; }
 
         /* View Selector Dropdown Bar (Replaces horizontal sliding tabs) */
         .view-selector-container {
@@ -943,32 +976,32 @@
 
         <!-- KPI METRICS -->
         <div class="metrics-grid">
-            <div class="metric-card">
+            <div class="metric-card m-load">
                 <div class="metric-label">Applied Load (P)</div>
                 <div class="metric-value" id="kpiP">200.0 kN</div>
                 <div class="metric-sub" id="kpiUR">UR = 76.8%</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card m-qall">
                 <div class="metric-label">Allowable (Q_all)</div>
                 <div class="metric-value" id="kpiQall">260.4 kN</div>
                 <div class="metric-sub" id="kpiFS">FS = 2.50</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card m-qult">
                 <div class="metric-label">Ultimate (Q_ult)</div>
                 <div class="metric-value" id="kpiQult">651.0 kN</div>
                 <div class="metric-sub">Total Resistance</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card m-qs">
                 <div class="metric-label">Shaft Friction (Q_s)</div>
-                <div class="metric-value" id="kpiQs" style="color: #2E7D32;">593.8 kN</div>
+                <div class="metric-value" id="kpiQs" style="color: #10B981;">593.8 kN</div>
                 <div class="metric-sub" id="kpiQsPct">91.2% Share</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card m-qb">
                 <div class="metric-label">End-Bearing (Q_b)</div>
-                <div class="metric-value" id="kpiQb" style="color: #1565C0;">57.3 kN</div>
+                <div class="metric-value" id="kpiQb" style="color: #06B6D4;">57.3 kN</div>
                 <div class="metric-sub" id="kpiQbPct">8.8% Share</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card m-slender">
                 <div class="metric-label">Slenderness (L/D)</div>
                 <div class="metric-value" id="kpiLD">33.3</div>
                 <div class="metric-sub" id="kpiAs">As = 21.2 m²</div>
@@ -1053,24 +1086,57 @@
 
         <!-- TAB 1: CHARTS -->
         <div class="tab-content" id="tab1">
-            <div class="charts-row">
-                <div class="card">
-                    <div class="card-title">Applied Load vs. Allowable Capacity</div>
-                    <div id="chartLoadCap" style="width: 100%; height: 350px;"></div>
-                </div>
-                <div class="card">
-                    <div class="card-title">Resistance Breakdown (Shaft vs. Base)</div>
-                    <div id="chartDonut" style="width: 100%; height: 350px;"></div>
+            <div style="margin-bottom: 16px;">
+                <div class="card-title" style="margin-bottom: 4px; font-size: 16px;">📊 Geotechnical Capacity & Parametric Sensitivity Analytics</div>
+                <div style="font-size: 12px; color: var(--text-muted);">
+                    Evaluate axial load safety margins, load-transfer distribution (skin friction vs. end bearing), and geometric sensitivity.
                 </div>
             </div>
             <div class="charts-row">
                 <div class="card">
-                    <div class="card-title">Length Sensitivity Analysis (L vs. Q)</div>
-                    <div id="chartLenSens" style="width: 100%; height: 350px;"></div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+                        <div class="card-title" style="margin: 0;">Applied Load vs. Allowable Capacity</div>
+                        <span id="loadCapRatioBadge" style="font-size: 11px; font-weight: 700; color: var(--success); font-family: var(--font-mono);">UR = 76.8%</span>
+                    </div>
+                    <div id="chartLoadCap" style="width: 100%; height: 350px;"></div>
+                    <div id="loadCapSummaryBadge" style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 11.5px; font-weight: 600; padding: 7px 12px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border);">
+                        <span>Demand: <b id="summaryP">200.0 kN</b></span>
+                        <span>Safety Buffer: <b id="summaryBuffer" style="color: var(--success);">+60.4 kN</b></span>
+                        <span>FS: <b id="summaryFS">2.50</b></span>
+                    </div>
                 </div>
                 <div class="card">
-                    <div class="card-title">Diameter Sensitivity Analysis (D vs. Q)</div>
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+                        <div class="card-title" style="margin: 0;">Resistance Breakdown (Shaft vs. Base)</div>
+                        <span id="donutDominanceBadge" style="font-size: 11px; font-weight: 700; color: #10B981;">Shaft-Dominated</span>
+                    </div>
+                    <div id="chartDonut" style="width: 100%; height: 350px;"></div>
+                    <div id="donutSummaryBadge" style="display: flex; justify-content: space-around; align-items: center; margin-top: 10px; font-size: 11.5px; font-weight: 600; padding: 7px 12px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border);">
+                        <span style="color: #10B981;">🟢 Shaft Friction: <b id="donutQs">593.8 kN (91.2%)</b></span>
+                        <span style="color: #3B82F6;">🔵 End Bearing: <b id="donutQb">57.3 kN (8.8%)</b></span>
+                    </div>
+                </div>
+            </div>
+            <div class="charts-row">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+                        <div class="card-title" style="margin: 0;">Length Sensitivity Analysis (L vs. Q)</div>
+                        <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Range: 4m - 30m</span>
+                    </div>
+                    <div id="chartLenSens" style="width: 100%; height: 350px;"></div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 10px; padding: 6px 10px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border);">
+                        💡 <b>Embedment Sensitivity:</b> Skin friction scales linearly with embedment depth <i>L</i>. Diamond marker indicates current design embedment.
+                    </div>
+                </div>
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px;">
+                        <div class="card-title" style="margin: 0;">Diameter Sensitivity Analysis (D vs. Q)</div>
+                        <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">Range: 0.25m - 1.50m</span>
+                    </div>
                     <div id="chartDiaSens" style="width: 100%; height: 350px;"></div>
+                    <div style="font-size: 11.5px; color: var(--text-muted); margin-top: 10px; padding: 6px 10px; background: var(--bg); border-radius: 6px; border: 1px solid var(--border);">
+                        💡 <b>Diameter Sensitivity:</b> Base area scales quadratically ($A_b \propto D^2$). Diamond marker indicates current pile diameter.
+                    </div>
                 </div>
             </div>
         </div>
@@ -1899,44 +1965,128 @@
             const c = latestCalc;
             const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
             const fontColor = isDark ? '#F8FAFC' : '#0F172A';
+            const fontMuted = isDark ? '#94A3B8' : '#64748B';
             const chartBg = isDark ? '#1E293B' : '#FFFFFF';
             const gridColor = isDark ? '#334155' : '#E2E8F0';
+            const plotConfig = { responsive: true, displayModeBar: false };
 
-            // Chart 1: Load vs Capacity Bar
+            const totalQult = c.isGroup ? c.groupQult : c.Qult;
+            const governingQall = c.governingQall;
+            const buffer = governingQall - c.P;
+
+            // Update Tab 1 HTML Summary Badges if present
+            const summaryP = document.getElementById('summaryP');
+            if (summaryP) summaryP.textContent = c.P.toFixed(1) + ' kN';
+            const summaryBuf = document.getElementById('summaryBuffer');
+            if (summaryBuf) {
+                summaryBuf.textContent = (buffer >= 0 ? '+' : '') + buffer.toFixed(1) + ' kN';
+                summaryBuf.style.color = buffer >= 0 ? 'var(--success)' : 'var(--danger)';
+            }
+            const summaryFS = document.getElementById('summaryFS');
+            if (summaryFS) summaryFS.textContent = c.FS.toFixed(2);
+            const urBadge = document.getElementById('loadCapRatioBadge');
+            if (urBadge) {
+                urBadge.textContent = 'UR = ' + (c.UR * 100).toFixed(1) + '%';
+                urBadge.style.color = c.isSafe ? (c.UR > 0.85 ? 'var(--warning)' : 'var(--success)') : 'var(--danger)';
+            }
+
+            const qsShare = (c.Qs / c.Qult) * 100;
+            const qbShare = (c.Qb / c.Qult) * 100;
+            const donutQs = document.getElementById('donutQs');
+            if (donutQs) donutQs.textContent = `${c.Qs.toFixed(1)} kN (${qsShare.toFixed(1)}%)`;
+            const donutQb = document.getElementById('donutQb');
+            if (donutQb) donutQb.textContent = `${c.Qb.toFixed(1)} kN (${qbShare.toFixed(1)}%)`;
+            const domBadge = document.getElementById('donutDominanceBadge');
+            if (domBadge) {
+                domBadge.textContent = qsShare >= 65 ? 'Shaft-Dominated' : (qbShare >= 50 ? 'End-Bearing Dominated' : 'Balanced Mechanism');
+                domBadge.style.color = qsShare >= 65 ? '#10B981' : '#3B82F6';
+            }
+
+            // Chart 1: Load vs Capacity Bar (Modern bar styling with allowable threshold line)
             Plotly.react('chartLoadCap', [{
                 type: 'bar',
                 x: ['Applied Load P', 'Allowable Q_all', 'Ultimate Q_ult'],
-                y: [c.P, c.governingQall, c.isGroup ? c.groupQult : c.Qult],
-                marker: { color: [c.isSafe ? (isDark ? '#22C55E' : '#388E3C') : '#EF4444', '#3B82F6', isDark ? '#64748B' : '#455A64'] },
-                text: [c.P.toFixed(1) + ' kN', c.governingQall.toFixed(1) + ' kN', (c.isGroup ? c.groupQult : c.Qult).toFixed(1) + ' kN'],
+                y: [c.P, governingQall, totalQult],
+                marker: {
+                    color: [c.isSafe ? '#10B981' : '#EF4444', '#3B82F6', isDark ? '#6366F1' : '#4F46E5'],
+                    line: {
+                        color: [c.isSafe ? '#059669' : '#DC2626', '#2563EB', '#4338CA'],
+                        width: 1.5
+                    }
+                },
+                text: [c.P.toFixed(1) + ' kN', governingQall.toFixed(1) + ' kN', totalQult.toFixed(1) + ' kN'],
                 textposition: 'outside',
-                textfont: { color: fontColor }
+                textfont: { color: fontColor, size: 12, weight: 'bold' },
+                hovertemplate: '<b>%{x}</b><br>Magnitude: <b>%{y:.1f} kN</b><extra></extra>'
             }], {
                 paper_bgcolor: chartBg,
                 plot_bgcolor: chartBg,
                 font: { color: fontColor },
-                yaxis: { title: 'Force (kN)', gridcolor: gridColor },
+                yaxis: {
+                    title: 'Force (kN)',
+                    gridcolor: gridColor,
+                    zerolinecolor: gridColor,
+                    range: [0, Math.max(totalQult, c.P) * 1.18]
+                },
                 xaxis: { gridcolor: gridColor },
-                margin: { l: 40, r: 20, t: 30, b: 40 }
-            });
+                margin: { l: 68, r: 25, t: 35, b: 45 },
+                shapes: [{
+                    type: 'line',
+                    x0: -0.45,
+                    x1: 2.45,
+                    y0: governingQall,
+                    y1: governingQall,
+                    line: { color: '#3B82F6', width: 2, dash: 'dash' }
+                }],
+                annotations: [{
+                    x: 1.0,
+                    y: governingQall,
+                    xref: 'x',
+                    yref: 'y',
+                    text: `Allowable Limit: ${governingQall.toFixed(1)} kN`,
+                    showarrow: false,
+                    yanchor: 'bottom',
+                    xanchor: 'center',
+                    font: { color: '#3B82F6', size: 11, weight: 'bold' }
+                }]
+            }, plotConfig);
 
-            // Chart 2: Resistance Donut
+            // Chart 2: Resistance Donut (Centered, never cut off, hole center annotation)
             Plotly.react('chartDonut', [{
                 type: 'pie',
                 labels: ['Shaft Resistance (Q_s)', 'Base Resistance (Q_b)'],
                 values: [c.Qs, c.Qb],
-                hole: 0.55,
-                marker: { colors: [isDark ? '#22C55E' : '#2E7D32', isDark ? '#3B82F6' : '#1565C0'] },
-                textinfo: 'label+percent',
-                textfont: { color: '#FFFFFF' }
+                hole: 0.60,
+                marker: {
+                    colors: ['#10B981', '#3B82F6'],
+                    line: { color: chartBg, width: 2 }
+                },
+                textinfo: 'percent',
+                textposition: 'inside',
+                textfont: { color: '#FFFFFF', size: 13, weight: 'bold' },
+                hovertemplate: '<b>%{label}</b><br>Magnitude: <b>%{value:.1f} kN</b> (%{percent})<extra></extra>'
             }], {
                 paper_bgcolor: chartBg,
                 font: { color: fontColor },
-                margin: { l: 20, r: 20, t: 30, b: 20 },
-                showlegend: false
-            });
+                margin: { l: 20, r: 20, t: 20, b: 40 },
+                showlegend: true,
+                legend: {
+                    orientation: 'h',
+                    x: 0.5,
+                    xanchor: 'center',
+                    y: -0.12,
+                    font: { color: fontColor, size: 11 }
+                },
+                annotations: [{
+                    text: `<b>${totalQult.toFixed(0)} kN</b><br><span style="font-size:11px;color:${fontMuted}">Ultimate Q_ult</span>`,
+                    showarrow: false,
+                    font: { size: 15, color: fontColor },
+                    x: 0.5,
+                    y: 0.5
+                }]
+            }, plotConfig);
 
-            // Chart 3: Length Sensitivity Curve
+            // Chart 3: Length Sensitivity Curve (Spline with filled area + current marker)
             const lens = [], qAlls = [], qUlts = [];
             for (let l = 4.0; l <= 30.0; l += 1.0) {
                 lens.push(l);
@@ -1944,81 +2094,172 @@
                 let tQs = 0, tQb = 0;
                 if (c.soilType === 'Clay') {
                     tQs = c.alpha * c.cu * tempAs;
-                    tQb = c.cu * 9.0 * c.Ab;
-                } else {
+                    const tNc = (l / c.D >= 4.0) ? 9.0 : 6.0 * (1 + 0.2 * (l / c.D));
+                    tQb = c.cu * tNc * c.Ab;
+                } else if (c.soilType === 'Sand') {
                     const zc = 15.0 * c.D;
+                    const deltaRad = (c.deltaRatio || 0.75) * c.phi * (Math.PI / 180.0);
+                    const beta = (c.ks || 0.70) * Math.tan(deltaRad);
                     const sigAvg = (l <= zc) ? 0.5 * c.gamma * l : ((0.5 * c.gamma * zc * zc) + c.gamma * zc * (l - zc)) / l;
-                    tQs = Math.min(0.7 * Math.tan(c.phi * 0.75 * Math.PI / 180) * sigAvg, 100) * tempAs;
-                    tQb = c.Qb;
+                    tQs = Math.min(beta * sigAvg, 100.0) * tempAs;
+                    const nq = getNq(c.phi);
+                    const sigToe = c.gamma * Math.min(l, zc);
+                    const qbUnit = Math.min(sigToe * nq, 50.0 * nq * Math.tan(c.phi * Math.PI / 180.0));
+                    tQb = qbUnit * c.Ab;
+                } else {
+                    tQs = (c.alpha * c.cu + 0.5 * c.gamma * l * 0.7 * Math.tan(0.75 * c.phi * Math.PI / 180)) * tempAs;
+                    tQb = (9.0 * c.cu + c.gamma * l * getNq(c.phi)) * c.Ab;
                 }
-                const tQult = tQs + tQb;
+                const tQult = c.isGroup ? (tQs + tQb) * c.totalPiles * c.eta : (tQs + tQb);
                 qUlts.push(tQult);
                 qAlls.push(tQult / c.FS);
             }
 
             Plotly.react('chartLenSens', [
-                { x: lens, y: qAlls, name: 'Q_all', line: { color: isDark ? '#FB923C' : '#E65100', width: 3 } },
-                { x: lens, y: qUlts, name: 'Q_ult', line: { color: isDark ? '#94A3B8' : '#455A64', dash: 'dot' } },
-                { x: [c.L], y: [c.Qall], mode: 'markers', marker: { size: 10, color: '#EF4444' }, name: 'Current L' }
+                {
+                    x: lens, y: qAlls, name: 'Allowable Q_all',
+                    line: { color: '#3B82F6', width: 3, shape: 'spline' },
+                    fill: 'tozeroy',
+                    fillcolor: isDark ? 'rgba(59, 130, 246, 0.08)' : 'rgba(59, 130, 246, 0.06)',
+                    hovertemplate: 'Length: %{x}m<br>Q_all: <b>%{y:.1f} kN</b><extra></extra>'
+                },
+                {
+                    x: lens, y: qUlts, name: 'Ultimate Q_ult',
+                    line: { color: '#8B5CF6', width: 2, dash: 'dot', shape: 'spline' },
+                    hovertemplate: 'Length: %{x}m<br>Q_ult: <b>%{y:.1f} kN</b><extra></extra>'
+                },
+                {
+                    x: [4, 30], y: [c.P, c.P], name: `Applied Load P (${c.P.toFixed(0)} kN)`,
+                    line: { color: '#EF4444', width: 2, dash: 'dash' },
+                    hovertemplate: 'Applied Demand: %{y:.1f} kN<extra></extra>'
+                },
+                {
+                    x: [c.L], y: [governingQall], mode: 'markers+text',
+                    marker: { size: 12, color: '#EF4444', symbol: 'diamond', line: { color: '#FFFFFF', width: 2 } },
+                    text: [`<b>Current: ${c.L}m</b>`], textposition: 'top left',
+                    name: 'Design Point'
+                }
             ], {
                 paper_bgcolor: chartBg,
                 plot_bgcolor: chartBg,
                 font: { color: fontColor },
                 xaxis: { title: 'Embedded Length L (m)', gridcolor: gridColor },
                 yaxis: { title: 'Capacity (kN)', gridcolor: gridColor },
-                margin: { l: 50, r: 20, t: 30, b: 40 }
-            });
+                margin: { l: 68, r: 25, t: 30, b: 45 },
+                legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.2, font: { size: 10 } }
+            }, plotConfig);
 
-            // Chart 4: Diameter Sensitivity
-            const dias = [], dQalls = [];
-            for (let d = 0.3; d <= 1.5; d += 0.05) {
-                dias.push(d);
+            // Chart 4: Diameter Sensitivity (Accurate geotechnical curve + current marker)
+            const dias = [], dQalls = [], dQults = [];
+            for (let d = 0.25; d <= 1.50; d += 0.05) {
+                dias.push(parseFloat(d.toFixed(2)));
                 const tAb = Math.PI * d * d / 4.0;
                 const tAs = Math.PI * d * c.L;
                 let tQs = 0, tQb = 0;
                 if (c.soilType === 'Clay') {
                     tQs = c.alpha * c.cu * tAs;
-                    tQb = c.cu * 9.0 * tAb;
+                    const tNc = (c.L / d >= 4.0) ? 9.0 : 6.0 * (1 + 0.2 * (c.L / d));
+                    tQb = c.cu * tNc * tAb;
+                } else if (c.soilType === 'Sand') {
+                    const zc = 15.0 * d;
+                    const deltaRad = (c.deltaRatio || 0.75) * c.phi * (Math.PI / 180.0);
+                    const beta = (c.ks || 0.70) * Math.tan(deltaRad);
+                    const sigAvg = (c.L <= zc) ? 0.5 * c.gamma * c.L : ((0.5 * c.gamma * zc * zc) + c.gamma * zc * (c.L - zc)) / c.L;
+                    tQs = Math.min(beta * sigAvg, 100.0) * tAs;
+                    const nq = getNq(c.phi);
+                    const sigToe = c.gamma * Math.min(c.L, zc);
+                    const qbUnit = Math.min(sigToe * nq, 50.0 * nq * Math.tan(c.phi * Math.PI / 180.0));
+                    tQb = qbUnit * tAb;
                 } else {
-                    tQs = 50.0 * tAs;
-                    tQb = 2000.0 * tAb;
+                    tQs = (c.alpha * c.cu + 0.5 * c.gamma * c.L * 0.7 * Math.tan(0.75 * c.phi * Math.PI / 180)) * tAs;
+                    tQb = (9.0 * c.cu + c.gamma * c.L * getNq(c.phi)) * tAb;
                 }
-                dQalls.push((tQs + tQb) / c.FS);
+                const tQult = c.isGroup ? (tQs + tQb) * c.totalPiles * c.eta : (tQs + tQb);
+                dQults.push(tQult);
+                dQalls.push(tQult / c.FS);
             }
 
             Plotly.react('chartDiaSens', [
-                { x: dias, y: dQalls, name: 'Q_all', line: { color: '#3B82F6', width: 3 } },
-                { x: [c.D], y: [c.Qall], mode: 'markers', marker: { size: 10, color: '#EF4444' }, name: 'Current D' }
+                {
+                    x: dias, y: dQalls, name: 'Allowable Q_all',
+                    line: { color: '#F59E0B', width: 3, shape: 'spline' },
+                    fill: 'tozeroy',
+                    fillcolor: isDark ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.06)',
+                    hovertemplate: 'Diameter: %{x}m<br>Q_all: <b>%{y:.1f} kN</b><extra></extra>'
+                },
+                {
+                    x: dias, y: dQults, name: 'Ultimate Q_ult',
+                    line: { color: '#8B5CF6', width: 2, dash: 'dot', shape: 'spline' },
+                    hovertemplate: 'Diameter: %{x}m<br>Q_ult: <b>%{y:.1f} kN</b><extra></extra>'
+                },
+                {
+                    x: [0.25, 1.50], y: [c.P, c.P], name: `Applied Load P (${c.P.toFixed(0)} kN)`,
+                    line: { color: '#EF4444', width: 2, dash: 'dash' },
+                    hovertemplate: 'Applied Demand: %{y:.1f} kN<extra></extra>'
+                },
+                {
+                    x: [c.D], y: [governingQall], mode: 'markers+text',
+                    marker: { size: 12, color: '#EF4444', symbol: 'diamond', line: { color: '#FFFFFF', width: 2 } },
+                    text: [`<b>Current: ${c.D}m</b>`], textposition: 'top left',
+                    name: 'Design Point'
+                }
             ], {
                 paper_bgcolor: chartBg,
                 plot_bgcolor: chartBg,
                 font: { color: fontColor },
                 xaxis: { title: 'Pile Diameter D (m)', gridcolor: gridColor },
                 yaxis: { title: 'Allowable Capacity (kN)', gridcolor: gridColor },
-                margin: { l: 50, r: 20, t: 30, b: 40 }
-            });
+                margin: { l: 68, r: 25, t: 30, b: 45 },
+                legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.2, font: { size: 10 } }
+            }, plotConfig);
 
-            // Chart 5: Hyperbolic Load-Settlement
+            // Chart 5: Hyperbolic Load-Settlement (Chin-Kondner Formulation)
             const sVals = [], pVals = [];
-            const ki = 35.0; // Initial stiffness kN/mm
-            for (let s = 0; s <= 40; s += 1) {
+            const ki = 38.0; // Initial tangent stiffness kN/mm
+            for (let s = 0; s <= 40; s += 0.5) {
                 sVals.push(s);
-                const p = (s === 0) ? 0 : s / ((1.0 / ki) + (s / c.Qult));
+                const p = (s === 0) ? 0 : s / ((1.0 / ki) + (s / totalQult));
                 pVals.push(p);
             }
 
+            let sOperating = 0;
+            if (c.P < totalQult) {
+                sOperating = c.P / (ki * Math.max(1.0 - c.P / totalQult, 0.05));
+            } else {
+                sOperating = 35.0;
+            }
+
             Plotly.react('chartSettle', [
-                { x: sVals, y: pVals, name: 'Hyperbolic Model', line: { color: '#38BDF8', width: 3 } },
-                { x: [0, 40], y: [c.Qall, c.Qall], name: 'Q_all', line: { color: isDark ? '#FB923C' : '#E65100', dash: 'dot' } },
-                { x: [0, 40], y: [c.Qult, c.Qult], name: 'Q_ult', line: { color: isDark ? '#94A3B8' : '#455A64', dash: 'dash' } }
+                {
+                    x: sVals, y: pVals, name: 'Chin-Kondner Hyperbolic',
+                    line: { color: '#0284C7', width: 3, shape: 'spline' },
+                    fill: 'tozeroy',
+                    fillcolor: isDark ? 'rgba(2, 132, 199, 0.08)' : 'rgba(2, 132, 199, 0.05)',
+                    hovertemplate: 'Settlement: %{x:.1f} mm<br>Load: <b>%{y:.1f} kN</b><extra></extra>'
+                },
+                {
+                    x: [0, 40], y: [governingQall, governingQall], name: `Q_all (${governingQall.toFixed(1)} kN)`,
+                    line: { color: '#3B82F6', width: 2, dash: 'dot' }
+                },
+                {
+                    x: [0, 40], y: [totalQult, totalQult], name: `Q_ult (${totalQult.toFixed(1)} kN)`,
+                    line: { color: '#8B5CF6', width: 2, dash: 'dash' }
+                },
+                {
+                    x: [sOperating], y: [c.P], mode: 'markers+text',
+                    marker: { size: 12, color: '#EF4444', symbol: 'diamond', line: { color: '#FFFFFF', width: 2 } },
+                    text: [`<b>Oper: ${sOperating.toFixed(1)}mm</b>`], textposition: 'bottom right',
+                    name: 'Operating Settlement'
+                }
             ], {
                 paper_bgcolor: chartBg,
                 plot_bgcolor: chartBg,
                 font: { color: fontColor },
                 xaxis: { title: 'Settlement S (mm)', gridcolor: gridColor },
                 yaxis: { title: 'Axial Load P (kN)', gridcolor: gridColor },
-                margin: { l: 50, r: 20, t: 30, b: 40 }
-            });
+                margin: { l: 68, r: 25, t: 30, b: 45 },
+                legend: { orientation: 'h', x: 0.5, xanchor: 'center', y: -0.2, font: { size: 10 } }
+            }, plotConfig);
         }
 
         // Render Step-by-Step Math Box
