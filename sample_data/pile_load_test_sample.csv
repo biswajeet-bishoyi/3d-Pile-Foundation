@@ -1,0 +1,16 @@
+# ASTM D1143 Standard Pile Load Test Example Data
+# Circular Driven Concrete Pile: D = 0.50 m, L = 15.0 m
+load_kN,settlement_mm
+0.0,0.00
+200.0,0.85
+400.0,1.92
+600.0,3.15
+800.0,4.68
+1000.0,6.54
+1200.0,8.92
+1400.0,12.10
+1600.0,16.45
+1800.0,23.20
+2000.0,33.50
+2150.0,46.80
+
