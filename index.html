@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -32,9 +32,28 @@
             --warning-bg: #FEF3C7;
             --radius: 8px;
             --font-mono: 'JetBrains Mono', monospace;
+            --shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        [data-theme="dark"] {
+            --primary: #3B82F6;
+            --primary-hover: #60A5FA;
+            --primary-light: rgba(59, 130, 246, 0.15);
+            --surface: #1E293B;
+            --bg: #0F172A;
+            --border: #334155;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --success: #4ADE80;
+            --success-bg: rgba(34, 197, 94, 0.18);
+            --danger: #F87171;
+            --danger-bg: rgba(239, 68, 68, 0.18);
+            --warning: #FBBF24;
+            --warning-bg: rgba(245, 158, 11, 0.18);
+            --shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             background-color: var(--bg);
@@ -56,7 +75,13 @@
             position: sticky;
             top: 0;
         }
-        .sidebar h2 { font-size: 16px; font-weight: 700; color: var(--primary); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .sidebar h2 { font-size: 16px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
         .sidebar h3 { font-size: 13px; font-weight: 600; color: var(--text-muted); margin: 20px 0 10px 0; text-transform: uppercase; }
         .form-group { margin-bottom: 14px; }
         .form-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--text-main); }
@@ -67,12 +92,12 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             font-size: 13px;
-            background: #FAFAFA;
+            background: var(--bg);
             color: var(--text-main);
             outline: none;
             transition: border-color 0.15s;
         }
-        select:focus, input[type="number"]:focus { border-color: var(--primary); background: #FFF; }
+        select:focus, input[type="number"]:focus { border-color: var(--primary); }
         .range-wrap { display: flex; align-items: center; gap: 10px; }
         .range-wrap input[type="range"] { flex: 1; accent-color: var(--primary); }
         .range-val { font-family: var(--font-mono); font-size: 13px; font-weight: 600; min-width: 50px; text-align: right; }
@@ -92,14 +117,60 @@
         }
         .btn-primary:hover { background: var(--primary-hover); }
 
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 13px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+        .theme-toggle-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px);
+        }
+        .theme-toggle-btn-small {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+        .theme-toggle-btn-small:hover {
+            border-color: var(--primary);
+            transform: rotate(20deg);
+        }
+
         /* Main Content */
         main.content {
             flex: 1;
             padding: 30px 40px;
             overflow-y: auto;
         }
-        .header-title { font-size: 26px; font-weight: 800; color: #1E3A8A; margin-bottom: 4px; }
-        .header-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-bottom: 16px; }
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+        .header-title { font-size: 26px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+        .header-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; }
         .disclaimer-banner {
             background: var(--warning-bg);
             border: 1px solid #FDE68A;
@@ -108,6 +179,9 @@
             border-radius: var(--radius);
             font-size: 12px;
             margin-bottom: 20px;
+        }
+        [data-theme="dark"] .disclaimer-banner {
+            border-color: rgba(245, 158, 11, 0.3);
         }
 
         /* Status Bar */
@@ -137,7 +211,7 @@
             border: 1px solid var(--border);
             border-radius: var(--radius);
             padding: 14px;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+            box-shadow: var(--shadow);
         }
         .metric-label { font-size: 11px; text-transform: uppercase; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
         .metric-value { font-size: 20px; font-weight: 800; color: var(--text-main); font-family: var(--font-mono); }
@@ -149,6 +223,7 @@
             border-bottom: 2px solid var(--border);
             margin-bottom: 20px;
             gap: 8px;
+            overflow-x: auto;
         }
         .tab-btn {
             padding: 10px 16px;
@@ -160,6 +235,7 @@
             cursor: pointer;
             border-bottom: 2px solid transparent;
             margin-bottom: -2px;
+            white-space: nowrap;
             transition: all 0.15s;
         }
         .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
@@ -174,11 +250,12 @@
             border-radius: var(--radius);
             padding: 18px;
             margin-bottom: 20px;
+            box-shadow: var(--shadow);
         }
-        .card-title { font-size: 15px; font-weight: 700; color: #1E3A8A; margin-bottom: 12px; }
+        .card-title { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 12px; }
 
         .step-box {
-            background: #F8FAFC;
+            background: var(--surface);
             border-left: 4px solid var(--primary);
             padding: 12px 16px;
             margin-bottom: 12px;
@@ -189,14 +266,15 @@
             font-size: 13px;
         }
         .step-title { font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-        .step-formula { color: #475569; font-family: var(--font-mono); font-size: 12px; margin-bottom: 4px; }
-        .step-substituted { color: #0F172A; font-family: var(--font-mono); font-size: 12px; }
+        .step-formula { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; margin-bottom: 4px; }
+        .step-substituted { color: var(--text-main); font-family: var(--font-mono); font-size: 12px; }
 
         .btn-outline {
             padding: 8px 14px;
-            background: #FFF;
+            background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius);
+            color: var(--text-main);
             font-size: 13px;
             font-weight: 600;
             cursor: pointer;
@@ -216,7 +294,10 @@
 
     <!-- SIDEBAR CONTROLS -->
     <aside class="sidebar">
-        <h2>🏗️ GeoSmart AI</h2>
+        <div class="sidebar-header">
+            <h2>🏗️ GeoSmart AI</h2>
+            <button class="theme-toggle-btn-small" onclick="toggleTheme()" title="Toggle Dark / Light Mode" id="sidebarThemeBtn">🌙</button>
+        </div>
 
         <div class="form-group">
             <label>📚 Load Benchmark Case</label>
@@ -343,8 +424,15 @@
 
     <!-- MAIN DISPLAY -->
     <main class="content">
-        <div class="header-title">GeoSmart AI — 3D Pile Foundation Simulator</div>
-        <div class="header-sub">Course: Foundation Engineering and Design (21CEE301T) | Version 1.0 (MVP)</div>
+        <div class="top-bar">
+            <div>
+                <div class="header-title">GeoSmart AI — 3D Pile Foundation Simulator</div>
+                <div class="header-sub">Course: Foundation Engineering and Design (21CEE301T) | Version 1.0 (MVP)</div>
+            </div>
+            <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark / Light Mode">
+                🌙 Dark Mode
+            </button>
+        </div>
 
         <div class="disclaimer-banner">
             ⚠️ <b>Educational Demonstration Notice:</b> This simulator demonstrates load transfer mechanisms (shaft friction, base end bearing, and group interaction) using classical methods (Tomlinson α-method, Meyerhof β-method, Converse-Labarre). It is for academic demonstration, not certified design software.
@@ -469,7 +557,7 @@
                 <div class="card-title">📚 Hand-Worked Textbook Verification Benchmarks</div>
                 <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px;">
                     <thead>
-                        <tr style="background: #F1F5F9; text-align: left;">
+                        <tr style="background: var(--bg); text-align: left;">
                             <th style="padding: 8px 12px; border: 1px solid var(--border);">Benchmark Case</th>
                             <th style="padding: 8px 12px; border: 1px solid var(--border);">Configuration</th>
                             <th style="padding: 8px 12px; border: 1px solid var(--border);">Hand-Worked Solution</th>
@@ -512,13 +600,43 @@
                     <button class="btn-outline" onclick="window.print()">🖨️ Print to PDF / Paper</button>
                     <button class="btn-outline" onclick="downloadCSV()">📊 Download CSV Summary</button>
                 </div>
-                <div id="reportPreview" style="background: #FFF; border: 1px solid var(--border); padding: 24px; border-radius: var(--radius);"></div>
+                <div id="reportPreview" style="background: var(--surface); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius);"></div>
             </div>
         </div>
     </main>
 
     <!-- CALCULATION & PLOTLY ENGINE SCRIPT -->
     <script>
+        // Theme Engine
+        function initTheme() {
+            const savedTheme = localStorage.getItem('geosmart_theme');
+            const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+            applyTheme(theme, false);
+        }
+
+        function applyTheme(theme, triggerRender = true) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('geosmart_theme', theme);
+            const isDark = (theme === 'dark');
+
+            const btn = document.getElementById('themeToggleBtn');
+            if (btn) btn.innerHTML = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+
+            const sBtn = document.getElementById('sidebarThemeBtn');
+            if (sBtn) sBtn.innerHTML = isDark ? '☀️' : '🌙';
+
+            if (triggerRender && latestCalc) {
+                render3D();
+                renderCharts();
+            }
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(current === 'dark' ? 'light' : 'dark');
+        }
+
         // Preset configurations
         const presets = {
             case1: { dia: 0.45, len: 15.0, type: 'Driven Concrete', load: 200, fs: 2.5, soil: 'Clay', gamma: 18.0, cu: 40.0, alpha: 0.70, mode: 'single' },
@@ -706,11 +824,17 @@
             renderReport();
         }
 
-        // Render 3D Model in Plotly
+        // Render 3D Model in Plotly with Dark / Light Mode Support
         function render3D() {
             const c = latestCalc;
             const radius = c.D / 2.0;
             const m = c.rows, n = c.cols, spacing = c.spacing;
+
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const sceneBg = isDark ? '#111827' : '#F8FAFC';
+            const gridColor = isDark ? '#374151' : '#CBD5E1';
+            const textColor = isDark ? '#F9FAFB' : '#1E293B';
+            const paperBg = isDark ? '#1E293B' : '#FFFFFF';
 
             // Compute pile centers
             const centers = [];
@@ -734,7 +858,7 @@
                 x: [[-extent, extent], [-extent, extent]],
                 y: [[-extent, -extent], [extent, extent]],
                 z: [[0, 0], [0, 0]],
-                colorscale: [[0, '#8D6E63'], [1, '#A1887F']],
+                colorscale: isDark ? [[0, '#4B5563'], [1, '#6B7280']] : [[0, '#8D6E63'], [1, '#A1887F']],
                 showscale: false,
                 opacity: 0.35,
                 hoverinfo: 'text',
@@ -757,7 +881,7 @@
                 i: [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
                 j: [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
                 k: [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
-                color: '#78909C',
+                color: isDark ? '#475569' : '#78909C',
                 opacity: 0.9,
                 name: 'Pile Cap'
             });
@@ -773,7 +897,7 @@
                 i: [7, 0, 0, 0, 4, 4, 6, 6, 4, 0, 3, 2],
                 j: [3, 4, 1, 2, 5, 6, 5, 2, 0, 1, 6, 3],
                 k: [0, 7, 2, 3, 6, 7, 1, 1, 5, 5, 7, 6],
-                color: '#546E7A',
+                color: isDark ? '#334155' : '#546E7A',
                 opacity: 0.95,
                 name: 'Column'
             });
@@ -783,9 +907,10 @@
                 type: 'scatter3d',
                 mode: 'lines+text',
                 x: [0, 0], y: [0, 0], z: [capH + colH + 2.0, capH + colH + 0.3],
-                line: { color: '#D32F2F', width: 8 },
+                line: { color: '#EF4444', width: 8 },
                 text: ['', '<b>P = ' + c.P.toFixed(1) + ' kN ↓</b>'],
                 textposition: 'top center',
+                textfont: { color: '#EF4444', size: 14 },
                 name: 'Applied Load'
             });
 
@@ -795,7 +920,7 @@
                 x: [0], y: [0], z: [capH + colH + 0.3],
                 u: [0], v: [0], w: [-0.8],
                 sizemode: 'scaled', sizeref: 0.6,
-                colorscale: [[0, '#D32F2F'], [1, '#D32F2F']],
+                colorscale: [[0, '#EF4444'], [1, '#EF4444']],
                 showscale: false,
                 name: 'Load Vector'
             });
@@ -823,7 +948,7 @@
                 traces.push({
                     type: 'surface',
                     x: xGrid, y: yGrid, z: zGrid,
-                    colorscale: [[0, '#455A64'], [1, '#607D8B']],
+                    colorscale: isDark ? [[0, '#374151'], [1, '#4B5563']] : [[0, '#455A64'], [1, '#607D8B']],
                     showscale: false,
                     opacity: 0.95,
                     name: 'Pile #' + (idx + 1)
@@ -835,18 +960,22 @@
                     x: [cen.x], y: [cen.y], z: [-c.L],
                     u: [0], v: [0], w: [0.5],
                     sizemode: 'scaled', sizeref: 0.5,
-                    colorscale: [[0, '#1565C0'], [1, '#1565C0']],
+                    colorscale: [[0, '#3B82F6'], [1, '#3B82F6']],
                     showscale: false,
                     name: 'Base Resistance'
                 });
             });
 
             const layout = {
-                title: '<b>Conceptual 3D Foundation Model</b> (Plotly 3D)',
+                title: {
+                    text: '<b>Conceptual 3D Foundation Model</b> (Plotly 3D)',
+                    font: { color: textColor, size: 14 }
+                },
+                paper_bgcolor: paperBg,
                 scene: {
-                    xaxis: { title: 'X (m)', backgroundcolor: '#F8FAFC' },
-                    yaxis: { title: 'Y (m)', backgroundcolor: '#F8FAFC' },
-                    zaxis: { title: 'Z (m)', backgroundcolor: '#F1F5F9' },
+                    xaxis: { title: 'X (m)', backgroundcolor: sceneBg, gridcolor: gridColor, color: textColor },
+                    yaxis: { title: 'Y (m)', backgroundcolor: sceneBg, gridcolor: gridColor, color: textColor },
+                    zaxis: { title: 'Z (m)', backgroundcolor: isDark ? '#0B0F19' : '#F1F5F9', gridcolor: gridColor, color: textColor },
                     aspectmode: 'data',
                     camera: { eye: { x: 1.8, y: -1.8, z: 1.2 } }
                 },
@@ -857,20 +986,29 @@
             Plotly.react('plot3d', traces, layout);
         }
 
-        // Render 2D Charts
+        // Render 2D Charts with Dark / Light Mode Support
         function renderCharts() {
             const c = latestCalc;
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const fontColor = isDark ? '#F8FAFC' : '#0F172A';
+            const chartBg = isDark ? '#1E293B' : '#FFFFFF';
+            const gridColor = isDark ? '#334155' : '#E2E8F0';
 
             // Chart 1: Load vs Capacity Bar
             Plotly.react('chartLoadCap', [{
                 type: 'bar',
                 x: ['Applied Load P', 'Allowable Q_all', 'Ultimate Q_ult'],
                 y: [c.P, c.governingQall, c.isGroup ? c.groupQult : c.Qult],
-                marker: { color: [c.isSafe ? '#388E3C' : '#D32F2F', '#1976D2', '#455A64'] },
+                marker: { color: [c.isSafe ? (isDark ? '#22C55E' : '#388E3C') : '#EF4444', '#3B82F6', isDark ? '#64748B' : '#455A64'] },
                 text: [c.P.toFixed(1) + ' kN', c.governingQall.toFixed(1) + ' kN', (c.isGroup ? c.groupQult : c.Qult).toFixed(1) + ' kN'],
-                textposition: 'outside'
+                textposition: 'outside',
+                textfont: { color: fontColor }
             }], {
-                yaxis: { title: 'Force (kN)' },
+                paper_bgcolor: chartBg,
+                plot_bgcolor: chartBg,
+                font: { color: fontColor },
+                yaxis: { title: 'Force (kN)', gridcolor: gridColor },
+                xaxis: { gridcolor: gridColor },
                 margin: { l: 40, r: 20, t: 30, b: 40 }
             });
 
@@ -880,9 +1018,12 @@
                 labels: ['Shaft Resistance (Q_s)', 'Base Resistance (Q_b)'],
                 values: [c.Qs, c.Qb],
                 hole: 0.55,
-                marker: { colors: ['#2E7D32', '#1565C0'] },
-                textinfo: 'label+percent'
+                marker: { colors: [isDark ? '#22C55E' : '#2E7D32', isDark ? '#3B82F6' : '#1565C0'] },
+                textinfo: 'label+percent',
+                textfont: { color: '#FFFFFF' }
             }], {
+                paper_bgcolor: chartBg,
+                font: { color: fontColor },
                 margin: { l: 20, r: 20, t: 30, b: 20 },
                 showlegend: false
             });
@@ -908,12 +1049,15 @@
             }
 
             Plotly.react('chartLenSens', [
-                { x: lens, y: qAlls, name: 'Q_all', line: { color: '#E65100', width: 3 } },
-                { x: lens, y: qUlts, name: 'Q_ult', line: { color: '#455A64', dash: 'dot' } },
-                { x: [c.L], y: [c.Qall], mode: 'markers', marker: { size: 10, color: '#D32F2F' }, name: 'Current L' }
+                { x: lens, y: qAlls, name: 'Q_all', line: { color: isDark ? '#FB923C' : '#E65100', width: 3 } },
+                { x: lens, y: qUlts, name: 'Q_ult', line: { color: isDark ? '#94A3B8' : '#455A64', dash: 'dot' } },
+                { x: [c.L], y: [c.Qall], mode: 'markers', marker: { size: 10, color: '#EF4444' }, name: 'Current L' }
             ], {
-                xaxis: { title: 'Embedded Length L (m)' },
-                yaxis: { title: 'Capacity (kN)' },
+                paper_bgcolor: chartBg,
+                plot_bgcolor: chartBg,
+                font: { color: fontColor },
+                xaxis: { title: 'Embedded Length L (m)', gridcolor: gridColor },
+                yaxis: { title: 'Capacity (kN)', gridcolor: gridColor },
                 margin: { l: 50, r: 20, t: 30, b: 40 }
             });
 
@@ -935,11 +1079,14 @@
             }
 
             Plotly.react('chartDiaSens', [
-                { x: dias, y: dQalls, name: 'Q_all', line: { color: '#1565C0', width: 3 } },
-                { x: [c.D], y: [c.Qall], mode: 'markers', marker: { size: 10, color: '#D32F2F' }, name: 'Current D' }
+                { x: dias, y: dQalls, name: 'Q_all', line: { color: '#3B82F6', width: 3 } },
+                { x: [c.D], y: [c.Qall], mode: 'markers', marker: { size: 10, color: '#EF4444' }, name: 'Current D' }
             ], {
-                xaxis: { title: 'Pile Diameter D (m)' },
-                yaxis: { title: 'Allowable Capacity (kN)' },
+                paper_bgcolor: chartBg,
+                plot_bgcolor: chartBg,
+                font: { color: fontColor },
+                xaxis: { title: 'Pile Diameter D (m)', gridcolor: gridColor },
+                yaxis: { title: 'Allowable Capacity (kN)', gridcolor: gridColor },
                 margin: { l: 50, r: 20, t: 30, b: 40 }
             });
 
@@ -953,12 +1100,15 @@
             }
 
             Plotly.react('chartSettle', [
-                { x: sVals, y: pVals, name: 'Hyperbolic Model', line: { color: '#1E88E5', width: 3 } },
-                { x: [0, 40], y: [c.Qall, c.Qall], name: 'Q_all', line: { color: '#E65100', dash: 'dot' } },
-                { x: [0, 40], y: [c.Qult, c.Qult], name: 'Q_ult', line: { color: '#455A64', dash: 'dash' } }
+                { x: sVals, y: pVals, name: 'Hyperbolic Model', line: { color: '#38BDF8', width: 3 } },
+                { x: [0, 40], y: [c.Qall, c.Qall], name: 'Q_all', line: { color: isDark ? '#FB923C' : '#E65100', dash: 'dot' } },
+                { x: [0, 40], y: [c.Qult, c.Qult], name: 'Q_ult', line: { color: isDark ? '#94A3B8' : '#455A64', dash: 'dash' } }
             ], {
-                xaxis: { title: 'Settlement S (mm)' },
-                yaxis: { title: 'Axial Load P (kN)' },
+                paper_bgcolor: chartBg,
+                plot_bgcolor: chartBg,
+                font: { color: fontColor },
+                xaxis: { title: 'Settlement S (mm)', gridcolor: gridColor },
+                yaxis: { title: 'Axial Load P (kN)', gridcolor: gridColor },
                 margin: { l: 50, r: 20, t: 30, b: 40 }
             });
         }
@@ -1018,16 +1168,16 @@
         function renderReport() {
             const c = latestCalc;
             document.getElementById('reportPreview').innerHTML = `
-                <h3 style="color:#1E3A8A;margin-bottom:8px;">GeoSmart AI — Academic Engineering Report</h3>
+                <h3 style="color:var(--primary);margin-bottom:8px;">GeoSmart AI — Academic Engineering Report</h3>
                 <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">Course: Foundation Engineering and Design (21CEE301T)</p>
                 <table style="width:100%;font-size:13px;border-collapse:collapse;">
-                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Pile Geometry</td><td style="padding:6px;border:1px solid #E2E8F0;">D = ${c.D}m, L = ${c.L}m (${c.pileType})</td></tr>
-                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Soil Stratum</td><td style="padding:6px;border:1px solid #E2E8F0;">${c.soilType} (γ = ${c.gamma} kN/m³)</td></tr>
-                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Shaft Resistance (Q_s)</td><td style="padding:6px;border:1px solid #E2E8F0;"><b>${c.Qs.toFixed(2)} kN</b></td></tr>
-                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Base Resistance (Q_b)</td><td style="padding:6px;border:1px solid #E2E8F0;"><b>${c.Qb.toFixed(2)} kN</b></td></tr>
-                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Ultimate Capacity (Q_ult)</td><td style="padding:6px;border:1px solid #E2E8F0;"><b>${c.Qult.toFixed(2)} kN</b></td></tr>
-                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Allowable Capacity (Q_all)</td><td style="padding:6px;border:1px solid #E2E8F0;"><b>${c.governingQall.toFixed(2)} kN</b> (FS = ${c.FS})</td></tr>
-                    <tr><td style="padding:6px;border:1px solid #E2E8F0;">Applied Load (P)</td><td style="padding:6px;border:1px solid #E2E8F0;">${c.P.toFixed(1)} kN (UR = ${(c.UR*100).toFixed(1)}%)</td></tr>
+                    <tr><td style="padding:6px;border:1px solid var(--border);">Pile Geometry</td><td style="padding:6px;border:1px solid var(--border);">D = ${c.D}m, L = ${c.L}m (${c.pileType})</td></tr>
+                    <tr><td style="padding:6px;border:1px solid var(--border);">Soil Stratum</td><td style="padding:6px;border:1px solid var(--border);">${c.soilType} (γ = ${c.gamma} kN/m³)</td></tr>
+                    <tr><td style="padding:6px;border:1px solid var(--border);">Shaft Resistance (Q_s)</td><td style="padding:6px;border:1px solid var(--border);"><b>${c.Qs.toFixed(2)} kN</b></td></tr>
+                    <tr><td style="padding:6px;border:1px solid var(--border);">Base Resistance (Q_b)</td><td style="padding:6px;border:1px solid var(--border);"><b>${c.Qb.toFixed(2)} kN</b></td></tr>
+                    <tr><td style="padding:6px;border:1px solid var(--border);">Ultimate Capacity (Q_ult)</td><td style="padding:6px;border:1px solid var(--border);"><b>${c.Qult.toFixed(2)} kN</b></td></tr>
+                    <tr><td style="padding:6px;border:1px solid var(--border);">Allowable Capacity (Q_all)</td><td style="padding:6px;border:1px solid var(--border);"><b>${c.governingQall.toFixed(2)} kN</b> (FS = ${c.FS})</td></tr>
+                    <tr><td style="padding:6px;border:1px solid var(--border);">Applied Load (P)</td><td style="padding:6px;border:1px solid var(--border);">${c.P.toFixed(1)} kN (UR = ${(c.UR*100).toFixed(1)}%)</td></tr>
                 </table>
             `;
         }
@@ -1060,9 +1210,9 @@
 
         // Initial launch
         window.addEventListener('DOMContentLoaded', () => {
+            initTheme();
             recalculate();
         });
     </script>
 </body>
 </html>
-
