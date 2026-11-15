@@ -33,6 +33,7 @@
             --radius: 8px;
             --font-mono: 'JetBrains Mono', monospace;
             --shadow: 0 1px 3px rgba(0,0,0,0.05);
+            --card-hover: 0 4px 6px -1px rgba(0,0,0,0.08);
         }
 
         [data-theme="dark"] {
@@ -51,6 +52,7 @@
             --warning: #FBBF24;
             --warning-bg: rgba(245, 158, 11, 0.18);
             --shadow: 0 1px 3px rgba(0,0,0,0.3);
+            --card-hover: 0 4px 6px -1px rgba(0,0,0,0.35);
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
@@ -63,59 +65,296 @@
             min-height: 100vh;
         }
 
-        /* Sidebar */
+        /* Modern Sidebar */
         aside.sidebar {
-            width: 360px;
+            width: 375px;
             background: var(--surface);
             border-right: 1px solid var(--border);
-            padding: 24px;
+            padding: 20px;
             overflow-y: auto;
             flex-shrink: 0;
             height: 100vh;
             position: sticky;
             top: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border) transparent;
         }
-        .sidebar-header {
+        aside.sidebar::-webkit-scrollbar { width: 5px; }
+        aside.sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+        /* Brand Block */
+        .brand-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+        .brand-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .brand-icon {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, #1E40AF, #3B82F6);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            box-shadow: 0 2px 6px rgba(30, 64, 175, 0.25);
+            flex-shrink: 0;
+        }
+        .brand-text h1 {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+        }
+        .brand-badge {
+            font-size: 10px;
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+        .brand-sub {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Sidebar Section Cards */
+        .side-section {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 13px 15px;
+            margin-bottom: 14px;
+            box-shadow: var(--shadow);
+            transition: all 0.2s ease;
+        }
+        .side-section:hover {
+            border-color: rgba(59, 130, 246, 0.45);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .side-section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        /* Segmented Button Groups */
+        .segmented-wrap {
+            display: flex;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 3px;
+            gap: 3px;
+            margin-bottom: 10px;
+        }
+        .seg-btn {
+            flex: 1;
+            padding: 6px 8px;
+            background: none;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .seg-btn.active {
+            background: var(--primary);
+            color: #FFF;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+        }
+        .seg-btn:hover:not(.active) {
+            color: var(--text-main);
+            background: rgba(0,0,0,0.04);
+        }
+
+        .form-group { margin-bottom: 11px; }
+        .form-group:last-child { margin-bottom: 0; }
+        .form-group label {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text-main);
         }
-        .sidebar h2 { font-size: 16px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.5px; }
-        .sidebar h3 { font-size: 13px; font-weight: 600; color: var(--text-muted); margin: 20px 0 10px 0; text-transform: uppercase; }
-        .form-group { margin-bottom: 14px; }
-        .form-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--text-main); }
-        .form-group label span.unit { color: var(--text-muted); font-weight: 400; }
+        .form-group label span.unit { color: var(--text-muted); font-weight: 400; font-size: 11px; }
+        
         select, input[type="number"] {
             width: 100%;
-            padding: 8px 12px;
+            padding: 7px 10px;
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 13px;
-            background: var(--bg);
+            border-radius: 6px;
+            font-size: 12px;
+            background: var(--surface);
             color: var(--text-main);
             outline: none;
-            transition: border-color 0.15s;
+            transition: border-color 0.15s, box-shadow 0.15s;
         }
-        select:focus, input[type="number"]:focus { border-color: var(--primary); }
-        .range-wrap { display: flex; align-items: center; gap: 10px; }
-        .range-wrap input[type="range"] { flex: 1; accent-color: var(--primary); }
-        .range-val { font-family: var(--font-mono); font-size: 13px; font-weight: 600; min-width: 50px; text-align: right; }
+        select:focus, input[type="number"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
 
+        /* Styled Range Slider */
+        .range-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .range-wrap input[type="range"] {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: var(--border);
+            accent-color: var(--primary);
+            outline: none;
+            cursor: pointer;
+        }
+        .range-val-badge {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 2px 7px;
+            border-radius: 5px;
+            color: var(--primary);
+            min-width: 54px;
+            text-align: center;
+        }
+
+        /* Load Adjustment Chip Buttons */
+        .chip-group {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4px;
+            margin-top: 6px;
+        }
+        .chip-btn {
+            padding: 4px 3px;
+            font-size: 10px;
+            font-weight: 600;
+            border-radius: 4px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .chip-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* Status Dot Animation */
+        .engine-status-bar {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 11px;
+            color: var(--text-muted);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin-bottom: 14px;
+        }
+        .status-dot-pulse {
+            width: 7px;
+            height: 7px;
+            background-color: #22C55E;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        /* Action Buttons */
         .btn-primary {
             width: 100%;
-            padding: 10px 16px;
-            background: var(--primary);
+            padding: 11px 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
             color: #FFF;
             border: none;
             border-radius: var(--radius);
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(30, 64, 175, 0.28);
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(30, 64, 175, 0.38);
+        }
+
+        .btn-reset {
+            width: 100%;
+            padding: 7px;
+            background: transparent;
+            border: 1px dashed var(--border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background 0.15s;
+            margin-top: 8px;
+            transition: all 0.15s;
         }
-        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-reset:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--bg);
+        }
+
+        /* Sidebar Course Footer */
+        .sidebar-footer {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
 
         /* Theme Toggle Buttons */
         .theme-toggle-btn {
@@ -356,134 +595,250 @@
 </head>
 <body>
 
-    <!-- SIDEBAR CONTROLS -->
+    <!-- MODERN UPGRADED SIDEBAR -->
     <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2>🏗️ GeoSmart AI</h2>
+        <!-- Brand Header -->
+        <div class="brand-box">
+            <div class="brand-logo-wrap">
+                <div class="brand-icon">🏗️</div>
+                <div class="brand-text">
+                    <h1>GeoSmart AI <span class="brand-badge">v1.0</span></h1>
+                    <div class="brand-sub">Pile Foundation Simulator</div>
+                </div>
+            </div>
             <button class="theme-toggle-btn-small" onclick="toggleTheme()" title="Toggle Dark / Light Mode" id="sidebarThemeBtn">🌙</button>
         </div>
 
-        <div class="form-group">
-            <label>📚 Load Benchmark Case</label>
-            <select id="presetSelect" onchange="loadPreset()">
-                <option value="custom">Custom Parameters</option>
-                <option value="case1" selected>Case 1: Driven Pile in Clay (Das 2019)</option>
-                <option value="case2">Case 2: Bored Pile in Sand (Meyerhof)</option>
-                <option value="case3">Case 3: 2×2 Pile Group in Clay</option>
-                <option value="case4">Case 4: Dense Sand End-Bearing Pile</option>
-                <option value="case5">Case 5: 3×3 Core Pile Group (9 Piles)</option>
-            </select>
+        <!-- Live Engine Status Badge -->
+        <div class="engine-status-bar">
+            <div class="status-dot-pulse"></div>
+            <span>Solver Engine: <strong style="color: var(--text-main);">Active & Ready</strong></span>
         </div>
 
-        <h3>1. Foundation Layout</h3>
-        <div class="form-group">
-            <label>Foundation Mode</label>
-            <select id="modeSelect" onchange="toggleGroupControls()">
-                <option value="single">Single Vertical Pile</option>
-                <option value="group">Pile Group (m × n)</option>
-            </select>
+        <!-- 1. Preset Benchmark Library Card -->
+        <div class="side-section" style="border-left: 3px solid var(--primary);">
+            <div class="side-section-header">
+                <span>📚 Benchmark Library</span>
+                <span style="font-size: 10px; color: var(--text-muted); text-transform: none;">5 Presets</span>
+            </div>
+            <div class="form-group">
+                <select id="presetSelect" onchange="loadPreset()">
+                    <option value="custom">⚙️ Custom Parameters</option>
+                    <option value="case1" selected>Case 1: Clay Driven Pile (Das 2019)</option>
+                    <option value="case2">Case 2: Sand Bored Pile (Meyerhof)</option>
+                    <option value="case3">Case 3: 2×2 Pile Group (Stiff Clay)</option>
+                    <option value="case4">Case 4: Dense Sand End-Bearing</option>
+                    <option value="case5">Case 5: 3×3 Tower Core Group (9 Piles)</option>
+                </select>
+            </div>
+            <div id="presetDescBox" style="font-size: 11px; color: var(--text-muted); margin-top: 6px; line-height: 1.4; background: var(--surface); padding: 7px 10px; border-radius: 6px; border: 1px solid var(--border);">
+                Textbook benchmark: Driven circular concrete pile in soft clay using Total Stress Alpha method.
+            </div>
         </div>
 
-        <div id="groupControls" style="display: none;">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <div class="form-group">
-                    <label>Rows (m)</label>
-                    <input type="number" id="groupRows" min="1" max="5" value="2" onchange="recalculate()">
+        <!-- 2. Foundation Layout & Group Configuration -->
+        <div class="side-section">
+            <div class="side-section-header">
+                <span>📐 Foundation Layout</span>
+                <span id="badgeLayoutType" style="font-size: 10px; background: var(--primary-light); color: var(--primary); padding: 1px 6px; border-radius: 4px; font-weight: 700;">Single</span>
+            </div>
+
+            <!-- Segmented Mode Control -->
+            <div class="segmented-wrap">
+                <button type="button" class="seg-btn active" id="segBtnSingle" onclick="setFoundationMode('single')">Single Pile</button>
+                <button type="button" class="seg-btn" id="segBtnGroup" onclick="setFoundationMode('group')">Pile Group (m×n)</button>
+            </div>
+            <input type="hidden" id="modeSelect" value="single">
+
+            <!-- Group Parameters (Shown when group is selected) -->
+            <div id="groupControls" style="display: none; padding-top: 4px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+                    <div class="form-group">
+                        <label>Rows (m) <span class="unit">count</span></label>
+                        <input type="number" id="groupRows" min="1" max="5" value="2" onchange="recalculate()">
+                    </div>
+                    <div class="form-group">
+                        <label>Cols (n) <span class="unit">count</span></label>
+                        <input type="number" id="groupCols" min="1" max="5" value="2" onchange="recalculate()">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>Cols (n)</label>
-                    <input type="number" id="groupCols" min="1" max="5" value="2" onchange="recalculate()">
+                    <label>
+                        <span>Spacing s</span>
+                        <span class="unit" id="spacingRatioBadge">1.50 m (3.3D)</span>
+                    </label>
+                    <input type="number" id="groupSpacing" step="0.1" value="1.50" onchange="updateSpacingDisplay(); recalculate();">
+                </div>
+                <div id="groupFootprintPill" style="font-size: 11px; color: var(--text-muted); background: var(--surface); padding: 6px 9px; border-radius: 6px; border: 1px solid var(--border); margin-bottom: 9px; line-height: 1.4;">
+                    Cap Footprint: <b>2.40m × 2.40m</b> (Area = 5.76 m²)
+                </div>
+                <div class="form-group">
+                    <label>Group Efficiency Model</label>
+                    <select id="effMethod" onchange="recalculate()">
+                        <option value="Converse-Labarre">Converse-Labarre Formula (Recommended)</option>
+                        <option value="Combined">Combined Minimum (Block + Converse)</option>
+                        <option value="Sum">Sum of Individual (No Loss)</option>
+                    </select>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Spacing s <span class="unit">(m)</span></label>
-                <input type="number" id="groupSpacing" step="0.1" value="1.50" onchange="recalculate()">
+        </div>
+
+        <!-- 3. Pile Geometry & Type -->
+        <div class="side-section">
+            <div class="side-section-header">
+                <span>🔩 Pile Geometry</span>
+                <span id="slendernessBadge" style="font-size: 10px; color: var(--text-muted); font-family: var(--font-mono);">L/D = 33.3</span>
             </div>
+
             <div class="form-group">
-                <label>Efficiency Method</label>
-                <select id="effMethod" onchange="recalculate()">
-                    <option value="Converse-Labarre">Converse-Labarre Formula</option>
-                    <option value="Combined">Combined Minimum (Block + CL)</option>
-                    <option value="Sum">Sum of Individual (No Loss)</option>
+                <label>
+                    <span>Diameter D</span>
+                    <span class="unit" id="diaAreaLabel">Ab = 0.159 m²</span>
+                </label>
+                <div class="range-wrap">
+                    <input type="range" id="pileDia" min="0.25" max="2.00" step="0.05" value="0.45" oninput="updateDiaDisplay(); recalculate();">
+                    <span class="range-val-badge" id="diaVal">0.45m</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>
+                    <span>Embedded Length L</span>
+                    <span class="unit" id="lenAreaLabel">As = 21.2 m²</span>
+                </label>
+                <div class="range-wrap">
+                    <input type="range" id="pileLen" min="4.0" max="40.0" step="0.5" value="15.0" oninput="updateLenDisplay(); recalculate();">
+                    <span class="range-val-badge" id="lenVal">15.0m</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Installation Method</label>
+                <select id="pileType" onchange="recalculate()">
+                    <option value="Driven Concrete">🏗️ Driven Concrete Pile</option>
+                    <option value="Bored Cast-in-situ">🚜 Bored Cast-in-situ Pile</option>
+                    <option value="Steel Pipe">⚙️ Driven Steel Pipe / H-Pile</option>
                 </select>
             </div>
         </div>
 
-        <h3>2. Pile Geometry</h3>
-        <div class="form-group">
-            <label>Diameter D <span class="unit">(m)</span></label>
-            <div class="range-wrap">
-                <input type="range" id="pileDia" min="0.25" max="2.00" step="0.05" value="0.45" oninput="updateRangeVal('pileDia', 'diaVal'); recalculate();">
-                <span class="range-val" id="diaVal">0.45m</span>
+        <!-- 4. Applied Loading & Safety Factor -->
+        <div class="side-section">
+            <div class="side-section-header">
+                <span>⚖️ Applied Load & Safety</span>
+                <span id="fsStatusBadge" style="font-size: 10px; color: var(--success); font-weight: 700;">FS = 2.50</span>
             </div>
-        </div>
-        <div class="form-group">
-            <label>Embedded Length L <span class="unit">(m)</span></label>
-            <div class="range-wrap">
-                <input type="range" id="pileLen" min="4.0" max="40.0" step="0.5" value="15.0" oninput="updateRangeVal('pileLen', 'lenVal'); recalculate();">
-                <span class="range-val" id="lenVal">15.0m</span>
-            </div>
-        </div>
-        <div class="form-group">
-            <label>Installation Type</label>
-            <select id="pileType" onchange="recalculate()">
-                <option value="Driven Concrete">Driven Concrete Pile</option>
-                <option value="Bored Cast-in-situ">Bored Cast-in-situ Pile</option>
-                <option value="Steel Pipe">Steel Pipe / H-Pile</option>
-            </select>
-        </div>
 
-        <h3>3. Applied Loading</h3>
-        <div class="form-group">
-            <label>Applied Axial Load P <span class="unit">(kN)</span></label>
-            <input type="number" id="appliedLoad" step="25" value="200" onchange="recalculate()">
-        </div>
-        <div class="form-group">
-            <label>Factor of Safety (FS)</label>
-            <input type="number" id="fsVal" step="0.1" min="1.5" max="4.0" value="2.5" onchange="recalculate()">
-        </div>
-
-        <h3>4. Soil Parameters</h3>
-        <div class="form-group">
-            <label>Soil Stratum Model</label>
-            <select id="soilType" onchange="toggleSoilControls(); recalculate();">
-                <option value="Clay">Cohesive (Clay)</option>
-                <option value="Sand">Cohesionless (Sand)</option>
-                <option value="Mixed">Mixed (c-phi Stratum)</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label>Unit Weight γ <span class="unit">(kN/m³)</span></label>
-            <input type="number" id="soilGamma" step="0.5" value="18.0" onchange="recalculate()">
-        </div>
-
-        <div id="clayControls">
             <div class="form-group">
-                <label>Undrained Cohesion c_u <span class="unit">(kPa)</span></label>
-                <input type="number" id="soilCu" step="5" value="40.0" onchange="recalculate()">
+                <label>
+                    <span>Applied Axial Load P</span>
+                    <span class="unit">kN</span>
+                </label>
+                <input type="number" id="appliedLoad" step="25" value="200" onchange="recalculate()">
+                <div class="chip-group">
+                    <button type="button" class="chip-btn" onclick="adjustLoad(50)">+50 kN</button>
+                    <button type="button" class="chip-btn" onclick="adjustLoad(250)">+250 kN</button>
+                    <button type="button" class="chip-btn" onclick="adjustLoad(1000)">+1000 kN</button>
+                    <button type="button" class="chip-btn" onclick="setToAllowable()" title="Reset load to allowable capacity Q_all">P = Q_all</button>
+                </div>
             </div>
+
             <div class="form-group">
-                <label>Adhesion Factor α</label>
-                <input type="number" id="soilAlpha" step="0.05" min="0.2" max="1.0" value="0.70" onchange="recalculate()">
+                <label>
+                    <span>Factor of Safety (FS)</span>
+                    <span class="unit" id="fsRecommendation">Standard: 2.5</span>
+                </label>
+                <div class="range-wrap">
+                    <input type="range" id="fsVal" min="1.5" max="4.0" step="0.1" value="2.5" oninput="updateFSDisplay(); recalculate();">
+                    <span class="range-val-badge" id="fsValDisplay">2.50</span>
+                </div>
             </div>
         </div>
 
-        <div id="sandControls" style="display: none;">
-            <div class="form-group">
-                <label>Friction Angle φ <span class="unit">(deg)</span></label>
-                <input type="number" id="soilPhi" step="1" min="20" max="45" value="34.0" onchange="recalculate()">
+        <!-- 5. Soil Profile & Geotechnical Mechanics -->
+        <div class="side-section">
+            <div class="side-section-header">
+                <span>🌍 Soil Stratum & Properties</span>
+                <span id="soilBadgeLabel" style="font-size: 10px; color: var(--text-muted);">Cohesive</span>
             </div>
-            <div class="form-group">
-                <label>Interface Ratio (δ / φ)</label>
-                <input type="number" id="deltaRatio" step="0.05" value="0.75" onchange="recalculate()">
+
+            <!-- Segmented Soil Type Buttons -->
+            <div class="segmented-wrap">
+                <button type="button" class="seg-btn active" id="segSoilClay" onclick="setSoilType('Clay')">🟤 Clay</button>
+                <button type="button" class="seg-btn" id="segSoilSand" onclick="setSoilType('Sand')">🟡 Sand</button>
+                <button type="button" class="seg-btn" id="segSoilMixed" onclick="setSoilType('Mixed')">🟠 Mixed</button>
             </div>
+            <input type="hidden" id="soilType" value="Clay">
+
             <div class="form-group">
-                <label>Earth Pressure Coeff K_s</label>
-                <input type="number" id="soilKs" step="0.1" value="0.70" onchange="recalculate()">
+                <label>
+                    <span>Unit Weight γ</span>
+                    <span class="unit">kN/m³</span>
+                </label>
+                <input type="number" id="soilGamma" step="0.5" value="18.0" onchange="recalculate()">
+            </div>
+
+            <!-- Clay parameters -->
+            <div id="clayControls">
+                <div class="form-group">
+                    <label>
+                        <span>Undrained Cohesion c_u</span>
+                        <span class="unit">kPa</span>
+                    </label>
+                    <input type="number" id="soilCu" step="5" value="40.0" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <span>Adhesion Factor α</span>
+                        <span class="unit">Tomlinson</span>
+                    </label>
+                    <input type="number" id="soilAlpha" step="0.05" min="0.2" max="1.0" value="0.70" onchange="recalculate()">
+                </div>
+            </div>
+
+            <!-- Sand parameters -->
+            <div id="sandControls" style="display: none;">
+                <div class="form-group">
+                    <label>
+                        <span>Friction Angle φ</span>
+                        <span class="unit">degrees (°)</span>
+                    </label>
+                    <input type="number" id="soilPhi" step="1" min="20" max="45" value="34.0" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <span>Interface Friction (δ / φ)</span>
+                        <span class="unit">ratio</span>
+                    </label>
+                    <input type="number" id="deltaRatio" step="0.05" value="0.75" onchange="recalculate()">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <span>Earth Pressure Coeff K_s</span>
+                        <span class="unit">lateral</span>
+                    </label>
+                    <input type="number" id="soilKs" step="0.1" value="0.70" onchange="recalculate()">
+                </div>
+            </div>
+            <div id="soilConsistencyBadge" style="font-size: 11px; color: var(--text-muted); margin-top: 8px; background: var(--surface); padding: 5px 9px; border-radius: 6px; border: 1px solid var(--border); line-height: 1.4;">
+                Consistency: <b>Soft Clay</b> (cu = 40.0 kPa)
             </div>
         </div>
 
-        <button class="btn-primary" onclick="recalculate()">⚡ Run Geotechnical Simulation</button>
+        <!-- Action Buttons -->
+        <button class="btn-primary" onclick="recalculate()">
+            <span>⚡</span>
+            <span>Run Geotechnical Simulation</span>
+        </button>
+        <button class="btn-reset" onclick="loadPreset('case1')">
+            <span>↺ Reset to Case 1 Benchmark</span>
+        </button>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer">
+            <span>Course: <b>21CEE301T</b></span>
+            <span>Academic MVP v1.0</span>
+        </div>
     </aside>
 
     <!-- MAIN DISPLAY -->
@@ -746,6 +1101,135 @@
             render3D();
         }
 
+        // Mode and Soil Segmented Controls
+        function setFoundationMode(mode) {
+            document.getElementById('modeSelect').value = mode;
+            document.getElementById('segBtnSingle').classList.toggle('active', mode === 'single');
+            document.getElementById('segBtnGroup').classList.toggle('active', mode === 'group');
+            document.getElementById('badgeLayoutType').textContent = (mode === 'single') ? 'Single' : 'Group';
+            document.getElementById('groupControls').style.display = (mode === 'group') ? 'block' : 'none';
+            recalculate();
+        }
+
+        function setSoilType(type) {
+            document.getElementById('soilType').value = type;
+            document.getElementById('segSoilClay').classList.toggle('active', type === 'Clay');
+            document.getElementById('segSoilSand').classList.toggle('active', type === 'Sand');
+            document.getElementById('segSoilMixed').classList.toggle('active', type === 'Mixed');
+            document.getElementById('soilBadgeLabel').textContent = type;
+            toggleSoilControls();
+            recalculate();
+        }
+
+        function updateDiaDisplay() {
+            const d = parseFloat(document.getElementById('pileDia').value);
+            document.getElementById('diaVal').textContent = d.toFixed(2) + 'm';
+            const ab = (Math.PI * d * d / 4).toFixed(3);
+            document.getElementById('diaAreaLabel').textContent = `Ab = ${ab} m²`;
+            updateSpacingDisplay();
+        }
+
+        function updateSpacingDisplay() {
+            const sEl = document.getElementById('groupSpacing');
+            const dEl = document.getElementById('pileDia');
+            const rEl = document.getElementById('groupRows');
+            const cEl = document.getElementById('groupCols');
+            if (!sEl || !dEl) return;
+            const s = parseFloat(sEl.value) || 1.5;
+            const d = parseFloat(dEl.value) || 0.45;
+            const rows = rEl ? parseInt(rEl.value) || 1 : 1;
+            const cols = cEl ? parseInt(cEl.value) || 1 : 1;
+            const ratio = (s / Math.max(d, 0.05)).toFixed(1);
+            const badge = document.getElementById('spacingRatioBadge');
+            if (badge) {
+                badge.textContent = `${s.toFixed(2)} m (${ratio}D)`;
+                if (ratio < 2.5) {
+                    badge.style.color = 'var(--danger)';
+                    badge.title = 'Close spacing (<2.5D): high stress overlap';
+                } else if (ratio <= 3.5) {
+                    badge.style.color = 'var(--success)';
+                    badge.title = 'Optimal spacing range (2.5D to 3.5D)';
+                } else {
+                    badge.style.color = 'var(--primary)';
+                    badge.title = 'Wide spacing (>=3.5D)';
+                }
+            }
+            const fpBadge = document.getElementById('groupFootprintPill');
+            if (fpBadge) {
+                const width = ((cols - 1) * s + d * 2).toFixed(2);
+                const length = ((rows - 1) * s + d * 2).toFixed(2);
+                const area = (width * length).toFixed(2);
+                fpBadge.innerHTML = `Cap Footprint: <b>${width}m × ${length}m</b> (${area} m²)`;
+            }
+        }
+
+        function adjustLoad(delta) {
+            const el = document.getElementById('appliedLoad');
+            const cur = parseFloat(el.value) || 0;
+            el.value = Math.max(10, Math.round(cur + delta));
+            recalculate();
+        }
+
+        function setToAllowable() {
+            if (latestCalc && latestCalc.governingQall) {
+                document.getElementById('appliedLoad').value = Math.round(latestCalc.governingQall);
+                recalculate();
+            }
+        }
+
+        function updateSoilConsistency() {
+            const st = document.getElementById('soilType').value;
+            const badge = document.getElementById('soilConsistencyBadge');
+            if (!badge) return;
+            if (st === 'Clay') {
+                const cu = parseFloat(document.getElementById('soilCu').value) || 40;
+                let cons = 'Soft';
+                if (cu < 25) cons = 'Very Soft';
+                else if (cu < 50) cons = 'Soft';
+                else if (cu < 100) cons = 'Medium Stiff';
+                else if (cu < 200) cons = 'Stiff';
+                else cons = 'Very Stiff / Hard';
+                badge.innerHTML = `Consistency: <b>${cons} Clay</b> (cu = ${cu.toFixed(1)} kPa)`;
+            } else if (st === 'Sand') {
+                const phi = parseFloat(document.getElementById('soilPhi').value) || 34;
+                let dens = 'Medium';
+                if (phi < 28) dens = 'Very Loose';
+                else if (phi < 30) dens = 'Loose';
+                else if (phi < 35) dens = 'Medium Dense';
+                else if (phi < 40) dens = 'Dense';
+                else dens = 'Very Dense';
+                badge.innerHTML = `Relative Density: <b>${dens} Sand</b> (φ = ${phi.toFixed(1)}°)`;
+            } else {
+                badge.innerHTML = `Stratum: <b>c-φ Combined Soil</b>`;
+            }
+        }
+
+        function updateLenDisplay() {
+            const l = parseFloat(document.getElementById('pileLen').value);
+            const d = parseFloat(document.getElementById('pileDia').value);
+            document.getElementById('lenVal').textContent = l.toFixed(1) + 'm';
+            const as = (Math.PI * d * l).toFixed(1);
+            document.getElementById('lenAreaLabel').textContent = `As = ${as} m²`;
+            document.getElementById('slendernessBadge').textContent = `L/D = ${(l/d).toFixed(1)}`;
+        }
+
+        function updateFSDisplay() {
+            const fs = parseFloat(document.getElementById('fsVal').value);
+            document.getElementById('fsValDisplay').textContent = fs.toFixed(2);
+            const badge = document.getElementById('fsStatusBadge');
+            badge.textContent = `FS = ${fs.toFixed(2)}`;
+            if (fs >= 2.5) {
+                badge.style.color = 'var(--success)';
+                document.getElementById('fsRecommendation').textContent = 'Standard Compliant';
+            } else if (fs >= 2.0) {
+                badge.style.color = 'var(--warning)';
+                document.getElementById('fsRecommendation').textContent = 'Marginal Buffer';
+            } else {
+                badge.style.color = 'var(--danger)';
+                document.getElementById('fsRecommendation').textContent = 'Low Safety Margin';
+            }
+        }
+
         // Theme Engine
         function initTheme() {
             const savedTheme = localStorage.getItem('geosmart_theme');
@@ -776,13 +1260,28 @@
             applyTheme(current === 'dark' ? 'light' : 'dark');
         }
 
-        // Preset configurations
+        // Preset configurations with descriptions
         const presets = {
-            case1: { dia: 0.45, len: 15.0, type: 'Driven Concrete', load: 200, fs: 2.5, soil: 'Clay', gamma: 18.0, cu: 40.0, alpha: 0.70, mode: 'single' },
-            case2: { dia: 0.60, len: 14.0, type: 'Bored Cast-in-situ', load: 750, fs: 2.5, soil: 'Sand', gamma: 18.5, phi: 34.0, ks: 0.70, deltaRatio: 0.75, mode: 'single' },
-            case3: { dia: 0.50, len: 12.0, type: 'Driven Concrete', load: 1800, fs: 2.5, soil: 'Clay', gamma: 19.0, cu: 65.0, alpha: 0.55, mode: 'group', rows: 2, cols: 2, spacing: 1.5 },
-            case4: { dia: 0.80, len: 16.0, type: 'Driven Concrete', load: 1800, fs: 2.5, soil: 'Sand', gamma: 20.0, phi: 38.0, ks: 1.10, deltaRatio: 0.85, mode: 'single' },
-            case5: { dia: 0.60, len: 15.0, type: 'Bored Cast-in-situ', load: 7500, fs: 2.5, soil: 'Clay', gamma: 19.5, cu: 80.0, alpha: 0.50, mode: 'group', rows: 3, cols: 3, spacing: 1.8 }
+            case1: {
+                dia: 0.45, len: 15.0, type: 'Driven Concrete', load: 200, fs: 2.5, soil: 'Clay', gamma: 18.0, cu: 40.0, alpha: 0.70, mode: 'single',
+                desc: 'Textbook benchmark: Driven concrete pile in soft clay using Total Stress Alpha method.'
+            },
+            case2: {
+                dia: 0.60, len: 14.0, type: 'Bored Cast-in-situ', load: 750, fs: 2.5, soil: 'Sand', gamma: 18.5, phi: 34.0, ks: 0.70, deltaRatio: 0.75, mode: 'single',
+                desc: 'Meyerhof method: Bored cast-in-situ pile in medium sand with critical depth zc = 9.0m.'
+            },
+            case3: {
+                dia: 0.50, len: 12.0, type: 'Driven Concrete', load: 1800, fs: 2.5, soil: 'Clay', gamma: 19.0, cu: 65.0, alpha: 0.55, mode: 'group', rows: 2, cols: 2, spacing: 1.5,
+                desc: '2×2 pile group in stiff clay. Converse-Labarre group efficiency η = 79.5% with block failure check.'
+            },
+            case4: {
+                dia: 0.80, len: 16.0, type: 'Driven Concrete', load: 1800, fs: 2.5, soil: 'Sand', gamma: 20.0, phi: 38.0, ks: 1.10, deltaRatio: 0.85, mode: 'single',
+                desc: 'Heavy industrial pile resting in dense sand (φ = 38°). End bearing dominant (>60%).'
+            },
+            case5: {
+                dia: 0.60, len: 15.0, type: 'Bored Cast-in-situ', load: 7500, fs: 2.5, soil: 'Clay', gamma: 19.5, cu: 80.0, alpha: 0.50, mode: 'group', rows: 3, cols: 3, spacing: 1.8,
+                desc: 'Large 9-pile core group (3×3) supporting multi-story superstructure column load.'
+            }
         };
 
         // Meyerhof Nq interpolation table
@@ -801,20 +1300,10 @@
             return 29.0;
         }
 
-        function updateRangeVal(id, displayId) {
-            document.getElementById(displayId).textContent = document.getElementById(id).value + 'm';
-        }
-
         function switchTab(index) {
             document.querySelectorAll('.tab-btn').forEach((btn, i) => btn.classList.toggle('active', i === index));
             document.querySelectorAll('.tab-content').forEach((tc, i) => tc.classList.toggle('active', i === index));
             window.dispatchEvent(new Event('resize'));
-        }
-
-        function toggleGroupControls() {
-            const isGroup = document.getElementById('modeSelect').value === 'group';
-            document.getElementById('groupControls').style.display = isGroup ? 'block' : 'none';
-            recalculate();
         }
 
         function toggleSoilControls() {
@@ -823,32 +1312,37 @@
             document.getElementById('sandControls').style.display = (st === 'Sand' || st === 'Mixed') ? 'block' : 'none';
         }
 
-        function loadPreset() {
-            const key = document.getElementById('presetSelect').value;
-            if (key === 'custom') return;
+        function loadPreset(forcedKey = null) {
+            const key = forcedKey || document.getElementById('presetSelect').value;
+            if (forcedKey) document.getElementById('presetSelect').value = forcedKey;
+            if (key === 'custom') {
+                document.getElementById('presetDescBox').textContent = 'Custom geometry, loading, and subsoil parameters.';
+                return;
+            }
             const p = presets[key];
             document.getElementById('pileDia').value = p.dia;
-            document.getElementById('diaVal').textContent = p.dia + 'm';
             document.getElementById('pileLen').value = p.len;
-            document.getElementById('lenVal').textContent = p.len + 'm';
             document.getElementById('pileType').value = p.type;
             document.getElementById('appliedLoad').value = p.load;
             document.getElementById('fsVal').value = p.fs;
-            document.getElementById('soilType').value = p.soil;
             document.getElementById('soilGamma').value = p.gamma;
             if (p.cu !== undefined) document.getElementById('soilCu').value = p.cu;
             if (p.alpha !== undefined) document.getElementById('soilAlpha').value = p.alpha;
             if (p.phi !== undefined) document.getElementById('soilPhi').value = p.phi;
             if (p.ks !== undefined) document.getElementById('soilKs').value = p.ks;
 
-            document.getElementById('modeSelect').value = p.mode;
+            if (p.desc) document.getElementById('presetDescBox').textContent = p.desc;
+
+            setFoundationMode(p.mode);
             if (p.mode === 'group') {
                 document.getElementById('groupRows').value = p.rows || 2;
                 document.getElementById('groupCols').value = p.cols || 2;
                 document.getElementById('groupSpacing').value = p.spacing || 1.5;
             }
-            toggleGroupControls();
-            toggleSoilControls();
+            setSoilType(p.soil);
+            updateDiaDisplay();
+            updateLenDisplay();
+            updateFSDisplay();
             recalculate();
         }
 
@@ -877,7 +1371,6 @@
             // Geometry
             const Ab = (Math.PI * D * D) / 4.0;
             const As = Math.PI * D * L;
-            const perimeter = Math.PI * D;
 
             let Qs = 0, Qb = 0;
             let alpha = alphaInput;
@@ -924,6 +1417,7 @@
                 eta = Math.max(0.40, Math.min(1.0, eta));
                 groupQult = (totalPiles * Qult) * eta;
                 groupQall = groupQult / FS;
+                document.getElementById('spacingRatioBadge').textContent = `${spacing.toFixed(2)}m (${(spacing/D).toFixed(1)}D)`;
             }
 
             const governingQall = isGroup ? groupQall : Qall;
@@ -962,6 +1456,9 @@
             sb.className = 'status-banner ' + (isSafe ? (UR > 0.85 ? 'status-warning' : 'status-safe') : 'status-danger');
             document.getElementById('statusText').textContent = isSafe ? 'SAFE / WITHIN ALLOWABLE CAPACITY' : 'OVERLOAD RISK / CAPACITY EXCEEDED';
             document.getElementById('urBadge').textContent = 'Utilization: ' + (UR * 100).toFixed(1) + '%';
+
+            updateSpacingDisplay();
+            updateSoilConsistency();
 
             render3D();
             renderCharts();
@@ -1512,6 +2009,11 @@
         // Initial launch
         window.addEventListener('DOMContentLoaded', () => {
             initTheme();
+            updateDiaDisplay();
+            updateLenDisplay();
+            updateFSDisplay();
+            updateSpacingDisplay();
+            updateSoilConsistency();
             recalculate();
         });
     </script>

@@ -129,7 +129,15 @@ from core.report_gen import generate_html_report, generate_pdf_report, generate_
 # SIDEBAR: PRESET BENCHMARK LOADER & PARAMETER CONTROLS
 # ============================================================================
 
-st.sidebar.markdown("## 🏗️ Model Parameters")
+st.sidebar.markdown("""
+<div style="background: linear-gradient(135deg, #1E3A8A, #3B82F6); padding: 14px 16px; border-radius: 10px; color: white; margin-bottom: 16px; box-shadow: 0 4px 10px rgba(30, 58, 138, 0.25);">
+    <div style="font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+        🏗️ GeoSmart AI <span style="font-size: 10px; background: rgba(255,255,255,0.25); padding: 2px 6px; border-radius: 4px;">v1.0</span>
+    </div>
+    <div style="font-size: 12px; opacity: 0.9; margin-top: 2px;">3D Pile Foundation Simulator</div>
+    <div style="font-size: 10px; opacity: 0.75; margin-top: 4px;">Course 21CEE301T • Foundation Engineering</div>
+</div>
+""", unsafe_allow_html=True)
 
 # 1. Preset Loader
 selected_preset_name = st.sidebar.selectbox(
