@@ -606,7 +606,6 @@
                     <div class="brand-sub">Pile Foundation Simulator</div>
                 </div>
             </div>
-            <button class="theme-toggle-btn-small" onclick="toggleTheme()" title="Toggle Dark / Light Mode" id="sidebarThemeBtn">🌙</button>
         </div>
 
         <!-- Live Engine Status Badge -->
@@ -1245,9 +1244,6 @@
 
             const btn = document.getElementById('themeToggleBtn');
             if (btn) btn.innerHTML = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
-
-            const sBtn = document.getElementById('sidebarThemeBtn');
-            if (sBtn) sBtn.innerHTML = isDark ? '☀️' : '🌙';
 
             if (triggerRender && latestCalc) {
                 render3D();
